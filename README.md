@@ -2,7 +2,7 @@
 
 - En este repositorio se encuentran los programas más relevantes que he desarrollado durante mi formación en Ingeniería Informática
 
-# Proyectos mas relevantes:
+# Proyectos más relevantes:
 
 - [Sistema basado en reglas con factores de certeza](Programas/C++/SBR-FC-SSII/)
 
