@@ -1,0 +1,21 @@
+mensajes UDP
+
+PING
+operation: ping
+protocolID: PROTOCOLID
+
+
+RESPUESTA PING
+operation: response
+response: welcome/denied/invalid
+
+GETFILELIST
+operation: getfilelist
+
+
+PPUBLISHFILELIST
+operation: publishfilelist
+
+GETCOMMONSERVERFILELIST
+operation: getcommonserverfilelist
+
