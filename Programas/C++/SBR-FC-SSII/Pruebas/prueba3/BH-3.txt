@@ -1,0 +1,9 @@
+6
+coductor2a3a, FC=-1
+conductorMas3a, FC=1
+seConduce2a3h, FC=1
+seConduceMas3h, FC=-1
+viajaAcomp, FC=-1
+joven, FC=0.4
+Objetivo
+causanteAcc

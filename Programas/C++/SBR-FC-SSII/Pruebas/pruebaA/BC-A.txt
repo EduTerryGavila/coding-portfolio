@@ -1,0 +1,10 @@
+9
+R1: Si ataqueNormal Entonces sinProblemasDeEstado, FC=1
+R2: Si ataqueSuperEf Entonces diezPorcientoVida, FC=0.7
+R3: Si ataqueParalizador Entonces paralizado, FC=0.6
+R4: Si diezPorcientoVida o paralizado Entonces muyDebilitado, FC=0.7
+R5: Si pokeball y muyDebilitado Entonces capturado, FC=0.6
+R6: Si ultraball y muyDebilitado Entonces capturado, FC=0.9
+R7: Si pokeball y sinProblemasDeEstado Entonces capturado, FC=-0.4
+R8: Si ultraball y sinProblemasDeEstado Entonces capturado, FC=-0.2
+R9: Si conDueño Entonces capturado, FC=-1

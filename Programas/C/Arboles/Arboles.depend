@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1714426375 source:c:\users\eterr\onedrive\documentos\arboles\main.c
+	<stdlib.h>
+	<stdio.h>
+	<windows.h>
+	"ABB.h"
+
+1714419781 c:\users\eterr\onedrive\documentos\arboles\abb.h
+

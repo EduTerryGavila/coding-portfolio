@@ -1,0 +1,40 @@
+==============================================
+Encadenamiento hacia atras
+Meta a demostrar: ganaEST
+Base de Hechos inicial: {localEST, visitanteRM, arbMod, publicoMayEST, publicoEqui, les2pivEST, les2pivRM}
+==============================================
+
+Conjunto de Reglas Candidatas (CC): { R1 R4 R6 }
+Regla seleccionada: R6
+Después de eliminar la regla seleccionada, CC queda: { R1 R4 }
+Nuevas metas: {les2pivEST}
+Verificando meta: les2pivEST
+Base de Hechos actual: { localEST (FC=1), visitanteRM (FC=1), arbMod (FC=1), publicoMayEST (FC=0.65), publicoEqui (FC=0.35), les2pivEST (FC=1), les2pivRM (FC=1) }
+La meta les2pivEST ya se encuentra verificada en la base.
+
+Calculando FC para la meta: ganaEST
+Hecho arbMod ya se encuentra en la base con FC = 1
+Aplicando regla activa (R1) para ganaEST:
+Antecedente: arbMod con FC = 1
+R1 (regla activada)
+Caso3 ->  0.4 * 1 = 0.4
+FC después de aplicar regla R1 en ganaEST = 0.4
+
+Regla R4:
+Hecho publicoEqui ya se encuentra en la base con FC = 0.35
+Caso3 ->  -0.55 * 0.35 = -0.1925
+FC derivado de la regla R4 = -0.1925
+Caso2 -> (0.4 + -0.1925) / (1 - 0.1925) = 0.256966
+FC acumulado para meta ganaEST tras combinar reglas = 0.256966
+
+Regla R6:
+Hecho les2pivEST ya se encuentra en la base con FC = 1
+Caso3 ->  -0.6 * 1 = -0.6
+FC derivado de la regla R6 = -0.6
+Caso2 -> (0.256966 + -0.6) / (1 - 0.256966) = -0.461667
+FC acumulado para meta ganaEST tras combinar reglas = -0.461667
+
+Resultado final para ganaEST -> FC: -0.461667
+
+==============================================
+Éxito: La meta ganaEST fue deducida satisfactoriamente.

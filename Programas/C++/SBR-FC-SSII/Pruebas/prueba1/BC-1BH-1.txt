@@ -1,0 +1,61 @@
+==============================================
+Encadenamiento hacia atras
+Meta a demostrar: h1
+Base de Hechos inicial: {h2, h4, h5, h6, h7}
+==============================================
+
+Conjunto de Reglas Candidatas (CC): { R1 R2 }
+Regla seleccionada: R2
+Después de eliminar la regla seleccionada, CC queda: { R1 }
+Nuevas metas: {h4}
+Verificando meta: h4
+Base de Hechos actual: { h2 (FC=0.3), h4 (FC=0.6), h5 (FC=0.6), h6 (FC=0.9), h7 (FC=0.5) }
+La meta h4 ya se encuentra verificada en la base.
+
+Calculando FC para la meta: h1
+Hecho h2 ya se encuentra en la base con FC = 0.3
+Aplicando regla activa (R1) para h1:
+Antecedente: h2 con FC = 0.3
+R1 (regla activada)
+Caso1 -> Regla R1 con conjunción 'o':
+Antecedente 1: h2 (FC inicial = 0.3)
+
+Nuevo hecho -> h3
+
+Calculando FC para la meta: h3
+Hecho h5 ya se encuentra en la base con FC = 0.6
+Aplicando regla activa (R3) para h3:
+Antecedente: h5 con FC = 0.6
+R3 (regla activada)
+Caso1 -> Regla R3 con conjunción 'y':
+Antecedente 1: h5 (FC inicial = 0.6)
+Hecho h6 ya se encuentra en la base con FC = 0.9
+Antecedente 2: h6 (FC = 0.9)
+AND: min(0.6, 0.9) = 0.6
+Caso3 ->  0.7 * 0.6 = 0.42
+FC después de aplicar regla R3 en h3 = 0.42
+
+Regla R4:
+Hecho h7 ya se encuentra en la base con FC = 0.5
+Caso3 ->  -0.5 * 0.5 = -0.25
+FC derivado de la regla R4 = -0.25
+Caso2 -> (0.42 + -0.25) / (1 - 0.25) = 0.226667
+FC acumulado para meta h3 tras combinar reglas = 0.226667
+
+Resultado final para h3 -> FC: 0.226667
+Antecedente 2: h3 (FC = 0.226667)
+OR: max(0.3, 0.226667) = 0.3
+Caso3 ->  0.5 * 0.3 = 0.15
+FC después de aplicar regla R1 en h1 = 0.15
+
+Regla R2:
+Hecho h4 ya se encuentra en la base con FC = 0.6
+Caso3 ->  1 * 0.6 = 0.6
+FC derivado de la regla R2 = 0.6
+Caso2 -> 0.15 + 0.6*(1-0.15) = 0.66
+FC acumulado para meta h1 tras combinar reglas = 0.66
+
+Resultado final para h1 -> FC: 0.66
+
+==============================================
+Éxito: La meta h1 fue deducida satisfactoriamente.

@@ -1,0 +1,90 @@
+==============================================
+Encadenamiento hacia atras
+Meta a demostrar: causanteAcc
+Base de Hechos inicial: {coductor2a3a, conductorMas3a, seConduce2a3h, seConduceMas3h, viajaAcomp, joven}
+==============================================
+
+Conjunto de Reglas Candidatas (CC): { R5 R6 R7 }
+Regla seleccionada: R7
+Después de eliminar la regla seleccionada, CC queda: { R5 R6 }
+Nuevas metas: {joven, bebido}
+Verificando meta: joven
+Base de Hechos actual: { coductor2a3a (FC=-1), conductorMas3a (FC=1), seConduce2a3h (FC=1), seConduceMas3h (FC=-1), viajaAcomp (FC=-1), joven (FC=0.4) }
+La meta joven ya se encuentra verificada en la base.
+
+Calculando FC para la meta: causanteAcc
+
+Nuevo hecho -> experimentado
+
+Calculando FC para la meta: experimentado
+Hecho coductor2a3a ya se encuentra en la base con FC = -1
+Aplicando regla activa (R1) para experimentado:
+Antecedente: coductor2a3a con FC = -1
+R1 (regla activada)
+Caso3 ->  0.5 * 0 = 0
+FC después de aplicar regla R1 en experimentado = 0
+
+Regla R2:
+Hecho conductorMas3a ya se encuentra en la base con FC = 1
+Caso3 ->  0.9 * 1 = 0.9
+FC derivado de la regla R2 = 0.9
+Caso2 -> 0 + 0.9*(1-0) = 0.9
+FC acumulado para meta experimentado tras combinar reglas = 0.9
+
+Resultado final para experimentado -> FC: 0.9
+Aplicando regla activa (R5) para causanteAcc:
+Antecedente: experimentado con FC = 0.9
+R5 (regla activada)
+Caso1 -> Regla R5 con conjunción 'y':
+Antecedente 1: experimentado (FC inicial = 0.9)
+Hecho viajaAcomp ya se encuentra en la base con FC = -1
+Antecedente 2: viajaAcomp (FC = -1)
+AND: min(0.9, -1) = -1
+Caso3 ->  -0.5 * 0 = -0
+FC después de aplicar regla R5 en causanteAcc = -0
+
+Regla R6:
+
+Nuevo hecho -> cansado
+
+Calculando FC para la meta: cansado
+Hecho seConduce2a3h ya se encuentra en la base con FC = 1
+Aplicando regla activa (R3) para cansado:
+Antecedente: seConduce2a3h con FC = 1
+R3 (regla activada)
+Caso3 ->  0.5 * 1 = 0.5
+FC después de aplicar regla R3 en cansado = 0.5
+
+Regla R4:
+Hecho seConduceMas3h ya se encuentra en la base con FC = -1
+Caso3 ->  1 * 0 = 0
+FC derivado de la regla R4 = 0
+Caso2 -> 0.5 + 0*(1-0.5) = 0.5
+FC acumulado para meta cansado tras combinar reglas = 0.5
+
+Resultado final para cansado -> FC: 0.5
+Caso3 ->  0.5 * 0.5 = 0.25
+FC derivado de la regla R6 = 0.25
+Caso2 -> -0 + 0.25*(1--0) = 0.25
+FC acumulado para meta causanteAcc tras combinar reglas = 0.25
+
+Regla R7:
+Hecho joven ya se encuentra en la base con FC = 0.4
+Caso1 -> Regla R7 con conjunción 'o':
+Antecedente 1: joven (FC inicial = 0.4)
+
+Nuevo hecho -> bebido
+
+Calculando FC para la meta: bebido
+No se encontraron reglas que concluyan bebido. Se asumira FC=0.0
+Antecedente 2: bebido (FC = 0)
+OR: max(0.4, 0) = 0.4
+Caso3 ->  0.7 * 0.4 = 0.28
+FC derivado de la regla R7 = 0.28
+Caso2 -> 0.25 + 0.28*(1-0.25) = 0.46
+FC acumulado para meta causanteAcc tras combinar reglas = 0.46
+
+Resultado final para causanteAcc -> FC: 0.46
+
+==============================================
+Éxito: La meta causanteAcc fue deducida satisfactoriamente.

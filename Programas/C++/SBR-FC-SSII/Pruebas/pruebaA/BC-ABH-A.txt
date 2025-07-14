@@ -1,0 +1,123 @@
+==============================================
+Encadenamiento hacia atras
+Meta a demostrar: capturado
+Base de Hechos inicial: {pokeball, ultraball, ataqueSuperEf, ataqueParalizador, conDueño, ataqueNormal}
+==============================================
+
+Conjunto de Reglas Candidatas (CC): { R5 R6 R7 R8 R9 }
+Regla seleccionada: R9
+Después de eliminar la regla seleccionada, CC queda: { R5 R6 R7 R8 }
+Nuevas metas: {conDueño}
+Verificando meta: conDueño
+Base de Hechos actual: { pokeball (FC=1), ultraball (FC=-1), ataqueSuperEf (FC=0.4), ataqueParalizador (FC=0.1), conDueño (FC=-0.8), ataqueNormal (FC=-1) }
+La meta conDueño ya se encuentra verificada en la base.
+
+Calculando FC para la meta: capturado
+Hecho pokeball ya se encuentra en la base con FC = 1
+Aplicando regla activa (R5) para capturado:
+Antecedente: pokeball con FC = 1
+R5 (regla activada)
+Caso1 -> Regla R5 con conjunción 'y':
+Antecedente 1: pokeball (FC inicial = 1)
+
+Nuevo hecho -> muyDebilitado
+
+Calculando FC para la meta: muyDebilitado
+
+Nuevo hecho -> diezPorcientoVida
+
+Calculando FC para la meta: diezPorcientoVida
+Hecho ataqueSuperEf ya se encuentra en la base con FC = 0.4
+Aplicando regla activa (R2) para diezPorcientoVida:
+Antecedente: ataqueSuperEf con FC = 0.4
+R2 (regla activada)
+Caso3 ->  0.7 * 0.4 = 0.28
+FC después de aplicar regla R2 en diezPorcientoVida = 0.28
+
+Resultado final para diezPorcientoVida -> FC: 0.28
+Aplicando regla activa (R4) para muyDebilitado:
+Antecedente: diezPorcientoVida con FC = 0.28
+R4 (regla activada)
+Caso1 -> Regla R4 con conjunción 'o':
+Antecedente 1: diezPorcientoVida (FC inicial = 0.28)
+
+Nuevo hecho -> paralizado
+
+Calculando FC para la meta: paralizado
+Hecho ataqueParalizador ya se encuentra en la base con FC = 0.1
+Aplicando regla activa (R3) para paralizado:
+Antecedente: ataqueParalizador con FC = 0.1
+R3 (regla activada)
+Caso3 ->  0.6 * 0.1 = 0.06
+FC después de aplicar regla R3 en paralizado = 0.06
+
+Resultado final para paralizado -> FC: 0.06
+Antecedente 2: paralizado (FC = 0.06)
+OR: max(0.28, 0.06) = 0.28
+Caso3 ->  0.7 * 0.28 = 0.196
+FC después de aplicar regla R4 en muyDebilitado = 0.196
+
+Resultado final para muyDebilitado -> FC: 0.196
+Antecedente 2: muyDebilitado (FC = 0.196)
+AND: min(1, 0.196) = 0.196
+Caso3 ->  0.6 * 0.196 = 0.1176
+FC después de aplicar regla R5 en capturado = 0.1176
+
+Regla R6:
+Hecho ultraball ya se encuentra en la base con FC = -1
+Caso1 -> Regla R6 con conjunción 'y':
+Antecedente 1: ultraball (FC inicial = -1)
+Hecho muyDebilitado ya se encuentra en la base con FC = 0.196
+Antecedente 2: muyDebilitado (FC = 0.196)
+AND: min(-1, 0.196) = -1
+Caso3 ->  0.9 * 0 = 0
+FC derivado de la regla R6 = 0
+Caso2 -> 0.1176 + 0*(1-0.1176) = 0.1176
+FC acumulado para meta capturado tras combinar reglas = 0.1176
+
+Regla R7:
+Hecho pokeball ya se encuentra en la base con FC = 1
+Caso1 -> Regla R7 con conjunción 'y':
+Antecedente 1: pokeball (FC inicial = 1)
+
+Nuevo hecho -> sinProblemasDeEstado
+
+Calculando FC para la meta: sinProblemasDeEstado
+Hecho ataqueNormal ya se encuentra en la base con FC = -1
+Aplicando regla activa (R1) para sinProblemasDeEstado:
+Antecedente: ataqueNormal con FC = -1
+R1 (regla activada)
+Caso3 ->  1 * 0 = 0
+FC después de aplicar regla R1 en sinProblemasDeEstado = 0
+
+Resultado final para sinProblemasDeEstado -> FC: 0
+Antecedente 2: sinProblemasDeEstado (FC = 0)
+AND: min(1, 0) = 0
+Caso3 ->  -0.4 * 0 = -0
+FC derivado de la regla R7 = -0
+Caso2 -> 0.1176 + -0*(1-0.1176) = 0.1176
+FC acumulado para meta capturado tras combinar reglas = 0.1176
+
+Regla R8:
+Hecho ultraball ya se encuentra en la base con FC = -1
+Caso1 -> Regla R8 con conjunción 'y':
+Antecedente 1: ultraball (FC inicial = -1)
+Hecho sinProblemasDeEstado ya se encuentra en la base con FC = 0
+Antecedente 2: sinProblemasDeEstado (FC = 0)
+AND: min(-1, 0) = -1
+Caso3 ->  -0.2 * 0 = -0
+FC derivado de la regla R8 = -0
+Caso2 -> 0.1176 + -0*(1-0.1176) = 0.1176
+FC acumulado para meta capturado tras combinar reglas = 0.1176
+
+Regla R9:
+Hecho conDueño ya se encuentra en la base con FC = -0.8
+Caso3 ->  -1 * 0 = -0
+FC derivado de la regla R9 = -0
+Caso2 -> 0.1176 + -0*(1-0.1176) = 0.1176
+FC acumulado para meta capturado tras combinar reglas = 0.1176
+
+Resultado final para capturado -> FC: 0.1176
+
+==============================================
+Éxito: La meta capturado fue deducida satisfactoriamente.

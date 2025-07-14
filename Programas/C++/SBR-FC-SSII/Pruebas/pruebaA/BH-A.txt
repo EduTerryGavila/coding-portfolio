@@ -1,0 +1,9 @@
+6
+pokeball, FC=1
+ultraball, FC=-1
+ataqueSuperEf, FC=0.4
+ataqueParalizador, FC=0.1
+conDueño, FC=-0.8
+ataqueNormal, FC=-1
+Objetivo
+capturado

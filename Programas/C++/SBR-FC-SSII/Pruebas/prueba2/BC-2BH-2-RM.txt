@@ -1,0 +1,45 @@
+==============================================
+Encadenamiento hacia atras
+Meta a demostrar: ganaRM
+Base de Hechos inicial: {localEST, visitanteRM, arbMod, publicoMayEST, publicoEqui, les2pivEST, les2pivRM}
+==============================================
+
+Conjunto de Reglas Candidatas (CC): { R2 R3 R5 }
+Regla seleccionada: R5
+Después de eliminar la regla seleccionada, CC queda: { R2 R3 }
+Nuevas metas: {les2pivRM, visitanteRM}
+Verificando meta: les2pivRM
+Base de Hechos actual: { localEST (FC=1), visitanteRM (FC=1), arbMod (FC=1), publicoMayEST (FC=0.65), publicoEqui (FC=0.35), les2pivEST (FC=1), les2pivRM (FC=1) }
+La meta les2pivRM ya se encuentra verificada en la base.
+
+Calculando FC para la meta: ganaRM
+Hecho arbMod ya se encuentra en la base con FC = 1
+Aplicando regla activa (R2) para ganaRM:
+Antecedente: arbMod con FC = 1
+R2 (regla activada)
+Caso3 ->  0.75 * 1 = 0.75
+FC después de aplicar regla R2 en ganaRM = 0.75
+
+Regla R3:
+Hecho publicoMayEST ya se encuentra en la base con FC = 0.65
+Caso3 ->  -0.4 * 0.65 = -0.26
+FC derivado de la regla R3 = -0.26
+Caso2 -> (0.75 + -0.26) / (1 - 0.26) = 0.662162
+FC acumulado para meta ganaRM tras combinar reglas = 0.662162
+
+Regla R5:
+Hecho les2pivRM ya se encuentra en la base con FC = 1
+Caso1 -> Regla R5 con conjunción 'y':
+Antecedente 1: les2pivRM (FC inicial = 1)
+Hecho visitanteRM ya se encuentra en la base con FC = 1
+Antecedente 2: visitanteRM (FC = 1)
+AND: min(1, 1) = 1
+Caso3 ->  -0.1 * 1 = -0.1
+FC derivado de la regla R5 = -0.1
+Caso2 -> (0.662162 + -0.1) / (1 - 0.1) = 0.624625
+FC acumulado para meta ganaRM tras combinar reglas = 0.624625
+
+Resultado final para ganaRM -> FC: 0.624625
+
+==============================================
+Éxito: La meta ganaRM fue deducida satisfactoriamente.

@@ -1,0 +1,2 @@
+El programa tarda 3 minutos y 57,820 segundos antes de la poda para la entrada extendida ofrecida por mooshak.
+El programa tras la poda tarda 6,379 segundos para la entrada extendida ofrecida por mooshak. 
