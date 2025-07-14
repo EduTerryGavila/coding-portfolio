@@ -2,7 +2,7 @@
 
 - En este repositorio se encuentran los programas más relevantes que he desarrollado durante mi formación en Ingeniería Informática
 
-## Proyectos mas relevantes:
+# Proyectos mas relevantes:
 
 - [Sistema basado en reglas con factores de certeza](Programas/C++/SBR-FC-SSII/)
 
@@ -11,6 +11,8 @@
 - [Divide y venceras](Programas/C++/AEDII-DyV/)
 
 - [Piedra papel o tijera con Machine Learning](Programas/Python/PiedraPapelTijeraTF_IA/)
+
+- [Algoritmo genético de nreinas](Programas/C++/AlgoritmoGeneticoNreinas/)
 
 # Programas por lenguaje:
 
