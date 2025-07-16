@@ -79,7 +79,7 @@ Para ejecutar el programa, desplázate al directorio de la prueba que desees uti
 >
 > ```bash
 > cd Pruebas/prueba1
-> ./programa BC.txt BH.txt
+> ./programa ./BC.txt ./BH.txt
 > ```
 
 ---
