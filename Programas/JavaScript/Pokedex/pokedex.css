@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #4b0082, #0a0f3d); 
+    margin: 0;
+    color: #ddd;
+}
+
+.container {
+    max-width: 500px;
+    width: 100%;
+}
+
+.card {
+    background: rgba(20, 20, 30, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 25px rgba(75, 0, 130, 0.7);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+    border: 1.5px solid rgba(100, 80, 255, 0.6);
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #a17fff;
+    text-shadow: 0 0 8px #836fff;
+}
+
+.search-bar {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #6b5fb5;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: rgba(30, 30, 45, 0.8);
+    color: #ddd;
+}
+
+input::placeholder {
+    color: rgba(200, 200, 230, 0.6);
+}
+
+input:focus {
+    outline: none;
+    border-color: #a17fff;
+    box-shadow: 0 0 15px rgba(161, 127, 255, 0.7);
+    background-color: rgba(35, 25, 55, 0.9);
+}
+
+button {
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #7e69f8, #5e44d6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(126, 105, 248, 0.8);
+}
+
+button:hover {
+    background: linear-gradient(45deg, #5e44d6, #7e69f8);
+    box-shadow: 0 0 20px rgba(161, 127, 255, 0.9);
+}
+
+#creature-details {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.details-card p {
+    margin: 6px 0;
+    padding: 6px 10px;
+    background-color: rgba(50, 45, 75, 0.8);
+    border-radius: 6px;
+    color: #ccc;
+    font-size: 0.95rem;
+    box-shadow: inset 0 0 6px rgba(100, 80, 255, 0.3);
+}
+
+#types span {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 0 12px rgba(120, 100, 255, 0.6);
+    user-select: none;
+}
+
+.type-normal { background: #6e6a55; }
+.type-fire { background: #b75020; }
+.type-water { background: #3463c7; }
+.type-electric { background: #c3b900; color: black; }
+.type-grass { background: #4f7a2b; }
+.type-ice { background: #75a8a7; color: black; }
+.type-fighting { background: #7e2a2b; }
+.type-poison { background: #7c3a79; }
+.type-ground { background: #aa954d; color: black; }
+.type-flying { background: #7668b3; }
+.type-psychic { background: #a73873; }
+.type-bug { background: #788c1c; }
+.type-rock { background: #8d7d33; }
+.type-ghost { background: #4e3b70; }
+.type-dragon { background: #5b36c9; }
+.type-dark { background: #4a3f3a; }
+.type-steel { background: #7b7b91; }
+.type-fairy { background: #a8608a; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#creature-image {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 50%;
+    border: 3px solid #836fff;
+    box-shadow: 0 0 20px rgba(130, 110, 255, 0.9);
+}
