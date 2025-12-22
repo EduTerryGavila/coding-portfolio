@@ -1,0 +1,1872 @@
+---
+title: "Documentacion_ApocalypticComputing. Práctica entregable de Análisis de datos y machine learning con R (caret)."
+author:
+  - (Profesor) Javier Marin-Blazquez Gomez (jgmarin@um.es)
+  - (Portavoz) Juan Alejandro González Ballesta (juanalejandro.gonzalezb@um.es)
+  - Alba García Camacho (alba.garciac4@um.es)
+  - Iván David Martínez Bleda (ivandavid.martinezb@um.es)
+  - Eduardo Terry Gavilá (eduardo.terryg@um.es)
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: spacelab
+    highlight: kate
+    df_print: paged
+    toc: true
+    toc_float: true
+    number_sections: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Carga de librerías necesarias
+library(caret)
+library(ggplot2)
+library(GGally)
+library(reshape2)
+library(gridExtra)
+
+library(randomForest)
+library(gbm)
+library(nnet)
+```
+
+# Introducción
+
+En este documento se aborda el análisis y preprocesamiento de la base de
+datos Credit Approval del repositorio UCI Machine Learning, con el
+propósito de entrenar y evaluar modelos clasificadores que permitan
+predecir aprobaciones de solicitudes de tarjetas de crédito. El dataset
+contiene 690 observaciones con 15 variables predictoras, 6 numéricas y 9
+categóricas, y una variable objetivo binaria que indica si la solicitud
+fue aprobada o rechazada.
+
+El análisis comienza con la carga y exploración detallada de los datos,
+seguido de un preprocesamiento riguroso que incluye tratamiento de
+valores perdidos y conversión correcta de tipos de datos. Posteriormente
+se entrenará y evaluará el rendimiento de cinco técnicas diferentes de
+Machine Learning, incluyendo obligatoriamente una red neuronal, con el
+objetivo de seleccionar el modelo óptimo para predicciones futuras.
+
+# Carga y preparación de datos
+
+## Carga de la base de datos
+
+En primer lugar, hay que establecer el directorio de trabajo de RStudio
+al directorio donde están todos los ficheros necesarios para la práctica
+(tal cual se descargan del Aula Virtual) con el comando
+\`setwd('ruta')\`. Después, cargamos la base de datos desde el archivo
+`crx.data` del repositorio UCI, que vendrá en la misma carpeta que esta
+documentación. El parámetro `na.strings = "?"` convierte automáticamente
+los símbolos de interrogación en valores NA para facilitar el
+tratamiento posterior de valores perdidos.
+
+```{r carga_datos}
+credit <- read.table("crx.data", sep=",", header=F, na.strings="?")
+```
+
+El dataset cargado contiene 690 observaciones y 16 columnas. Las
+primeras 15 columnas son variables predictoras y la columna 16 es la
+variable objetivo que indica la decisión sobre la solicitud.
+
+## Renombrado y preparación de la variable objetivo
+
+Renombramos la variable objetivo V16 a "Clase" para mayor claridad.
+Además, convertimos los símbolos "+" y "-" a etiquetas comprensibles
+"Aprobado" y "Rechazado", y transformamos la variable a factor,
+requisito fundamental para trabajar con algoritmos de clasificación en
+caret.
+
+```{r preparar_target}
+names(credit)[names(credit) == "V16"] <- "Clase"
+
+credit$Clase <- as.character(credit$Clase)
+credit$Clase[credit$Clase == "+"] <- "Aprobado"
+credit$Clase[credit$Clase == "-"] <- "Rechazado"
+credit$Clase <- as.factor(credit$Clase)
+
+credit
+```
+
+## Conversión de tipos de datos
+
+Es fundamental especificar correctamente los tipos de datos de cada
+variable. Las variables numéricas deben ser de tipo `numeric` y las
+categóricas de tipo `factor`.
+
+### Variables numéricas
+
+El dataset contiene seis variables numéricas: V2, V3, V8, V11, V14 y
+V15. En este punto aún no conocemos su significado exacto, pero las
+convertimos a tipo numérico para poder analizarlas posteriormente.
+
+```{r conversion_numericas}
+credit$V2 <- as.numeric(credit$V2)
+credit$V3 <- as.numeric(credit$V3)
+credit$V8 <- as.numeric(credit$V8)
+credit$V11 <- as.numeric(credit$V11)
+credit$V14 <- as.numeric(credit$V14)
+credit$V15 <- as.numeric(credit$V15)
+```
+
+### Variables categóricas
+
+El dataset contiene nueve variables categóricas: V1, V4, V5, V6, V7, V9,
+V10, V12 y V13. Al igual que con las numéricas, desconocemos su
+significado real en este punto, pero las convertimos a tipo factor para
+el análisis.
+
+```{r conversion_categoricas}
+credit$V1 <- as.factor(credit$V1)
+credit$V4 <- as.factor(credit$V4)
+credit$V5 <- as.factor(credit$V5)
+credit$V6 <- as.factor(credit$V6)
+credit$V7 <- as.factor(credit$V7)
+credit$V9 <- as.factor(credit$V9)
+credit$V10 <- as.factor(credit$V10)
+credit$V12 <- as.factor(credit$V12)
+credit$V13 <- as.factor(credit$V13)
+```
+
+Podemos observar ahora el resumen de la base de datos, comprobando que
+las variables categóricas son de formato `Factor`\`.
+
+```{r}
+str(credit)
+```
+
+Atendiendo a la especificación del repositorio UCI acerca de este
+dataset, se aprecia que falta un factor dentro V4: debería estar formado
+por u, y, l, t, pero nos falta la t. Así que la añadimos.
+
+```{r}
+levels(credit$V4) <- c(levels(credit$V4), "t")
+levels(credit$V4)
+```
+
+## Análisis de predictores categóricos
+
+Antes de profundizar en las variables numéricas, exploramos las
+variables categóricas para entender su estructura y evaluar qué tipo de
+información podrían aportar.
+
+```{r analisis_categoricas, results='asis'}
+variables_categoricas <- c("V1", "V4", "V5", "V6", "V7", "V9", "V10", "V12", "V13")
+
+lista_plots <- list()
+
+for(i in seq_along(variables_categoricas)) {
+  columna <- variables_categoricas[i]
+  
+  p <- ggplot(subset(credit, !is.na(credit[[columna]])), aes_string(x = columna)) +
+    geom_bar(fill = "blue", color = "black", alpha = 0.8) +
+    geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+    labs(title = paste("Distribución de", columna),
+         x = columna, y = "Frecuencia") +
+    theme_minimal() +
+    theme(plot.title = element_text(size=10))
+  
+  lista_plots[[i]] <- p
+}
+
+grid.arrange(grobs = lista_plots, ncol = 3)
+```
+
+El análisis gráfico de las variables categóricas nos ha permitido
+evaluar la estructura de cada una, aunque aún desconocemos su
+significado real. Observamos que algunas variables como V7 o V13 están
+dominadas mayoritariamente por una única categoría, lo que sugiere que
+podrían aportar poco valor predictivo. Otras como V6 aparecen muy
+dispersas en múltiples grupos pequeños. Sin embargo, el hallazgo más
+interesante es que V9 y V10 muestran una estructura binaria muy clara
+(valores "t" y "f"), lo que nos hace pensar que podrían representar
+variables de tipo sí/no relacionadas con el historial del cliente.
+
+## Análisis de variables numéricas
+
+Tras el análisis de las variables categóricas, ahora nos centramos en
+profundizar en las tres variables numéricas que nos han parecido más
+relevantes para la predicción: **V8, V11 y V15**.
+
+¿Por qué hemos escogido precisamente estas? Desde el punto de vista de
+los datos, al ser variables continuas con rangos amplios, son las que
+"más juego" nos dan para buscar patrones, ver formas extrañas en los
+histogramas (como colas largas) y detectar valores atípicos (outliers).
+Además, intuimos que podrían estar relacionadas con factores importantes
+para la decisión crediticia.
+
+### Variable V8
+
+```{r}
+summary(credit$V8)
+```
+
+Podemos observar que V8 tiene un rango de valores amplio, concretamente
+entre 0 y 28.5. Sin embargo, la mediana y los cuartiles están agrupados
+en el rango entre 0 y 3, lo que nos sugiere que la mayoría de los datos
+están entre esos rangos.
+
+```{r}
+V8_sin_na <- credit$V8[!is.na(credit$V8)]
+
+cat(sprintf("1. Conteo de datos entre 0 y 3: %d\n", sum(V8_sin_na >= 0 & V8_sin_na <= 3)))
+cat(sprintf("2. Conteo de datos con más de 3: %d\n", sum(V8_sin_na > 3)))
+```
+
+Procedemos ahora a realizar un histograma de nuestros datos, indicando
+junto a él la media.
+
+```{r analisis_v8}
+myhistV8 = ggplot(credit, aes(x = V8)) +
+  geom_histogram(bins = 30, fill = "orange", alpha = 0.7) +
+  labs(title = "Distribución de V8",
+       x = "V8", y = "Frecuencia")
+
+# Marca el valor de la media con una línea azul vertical
+myhistV8 = myhistV8 + geom_vline(xintercept=mean(credit$V8), col="blue", linetype="dashed")
+
+# Marca el valor de la mediana con una línea roja vertical
+myhistV8 = myhistV8 + geom_vline(xintercept = median(credit$V8),
+                             col="red", linetype="dashed")
+
+myhistV8
+
+```
+
+**Interpretación:** V8 presenta valores que típicamente oscilan entre 0
+y 16 y parece que siguen una distribución exponencial. Entonces, debemos
+pensar en una variable que tenga que ver con la concesión de tarjetas de
+crédito y que conforme aumente su valor, sea menos probable.
+
+Pensando que no hay valores más allá de 30, podríamos pensar que son los
+**años trabajados** por los clientes. Un número elevado de años
+trabajando podrían inferir cierta estabilidad y confianza al banco, por
+lo que podría ser una variable de interés. También pensamos en otras
+alternativas como número de tarjetas pedidas con anterioridad, o
+renovaciones, pero 30 parece un número excesivo.
+
+Esos datos superiores a 16 son extraños. Sin embargo, no parecen que
+sean recolección errónea de datos porque pensamos que pueden existir
+personas que soliciten tarjetas de crédito con dichos años trabajados.
+Quizás simplemente esa persona cambió de banco y solicitó una tarjeta
+nueva.
+
+**Distribución**: Como ya he dicho antes, los datos parecen seguir la
+**Distribución Exponencial** en su forma general, caracterizada por un
+**fuerte sesgo a la derecha** y una alta concentración en valores bajos
+(cercanos a cero).
+
+Este tipo de distribución se compone de **un solo parámetro, la tasa
+(**$\lambda$), donde la media es $\mu = 1/\lambda$. El valor de
+$\lambda$ se estima como el inverso de la media muestral.
+
+```{r}
+# Aseguramos que solo usamos los datos no faltantes de V8
+V8_sin_na <- credit$V8[!is.na(credit$V8)]
+mediaV8 = mean(V8_sin_na)
+lambdaV8 = 1/mediaV8
+
+cat("Media de V8:", mediaV8, "\n")
+cat("Tenemos una exponencial con parámetro lambda =", lambdaV8, "\n")
+```
+
+#### Diagrama Q-Q Exponencial
+
+Para verificar el ajuste a la exponencial, comparamos los cuantiles
+muestrales de V8 con los cuantiles teóricos de una distribución
+exponencial con $\lambda=rround(\lambda_{V8},4)$
+
+```{r}
+qq_data_exp <- data.frame(
+  # Cuantiles teóricos (eje X)
+  Teorico = qexp(ppoints(length(V8_sin_na)), rate = lambdaV8),
+  # Cuantiles muestrales (eje Y)
+  Muestral = sort(V8_sin_na)
+)
+
+# 2. Generar el Q-Q Plot
+p_qq_exp <- ggplot(qq_data_exp, aes(x = Teorico, y = Muestral)) +
+  geom_point(color = "darkorange") +
+  # Línea de referencia y = (1/lambda) * x
+  geom_abline(intercept = 0, slope = 1/lambdaV8, color = "red", linetype = "dashed", size = 1) +
+  labs(title = "Diagrama Q-Q: V8 vs. Distribución Exponencial",
+       x = paste0("Cuantiles Teóricos Exponenciales (λ = ", round(lambdaV8, 4), ")"),
+       y = "Cuantiles Empíricos de V8") +
+  theme_minimal()
+
+p_qq_exp
+```
+
+**Conclusión del Q-Q Exponencial:** Parece que los datos no se ajustan
+para nada a una exponencial, pero no nos alarmemos. Hemos únicamente
+visto la forma en la frecuencia decrece conforme crece el número de
+años, pero por la naturaleza de la variable, una persona no puede
+trabajar un número negativo de años. ¿Y si estamos en una normal
+centrada en 0 donde únicamente nos quedamos con su lado derecho?
+
+Para poder ilustrarlo a través de un diagrama Q-Q, vamos a crear una
+normal "falsa" donde la mitad izquierda está compuesta por los mismos
+valores pero cambiados de signo. De esta forma tenemos una normal
+centrada en 0, que es lo que nos sugiere los datos de V8.
+
+```{r}
+
+
+# 1. Preparación de datos originales (excluyendo NA y ceros para la simetría)
+V8_sin_na <- credit$V8[!is.na(credit$V8)]
+
+# 2. Creación del conjunto de datos sintético simétrico
+V8_simetrico <- c(V8_sin_na, -V8_sin_na)
+
+# 3. Generación del Q-Q Plot de Normalidad
+p_qq_simetrico <- ggplot(data.frame(x = V8_simetrico), aes(sample = x)) +
+  ggtitle("Q-Q Plot: V8 Sintético Simétrico vs. Distribución Normal") +
+  geom_qq(color = "darkblue") + 
+  stat_qq_line(col = "red") + 
+  xlab("Cuantiles Teóricos Normales") + ylab("Cuantiles del Conjunto Sintético") +
+  theme_minimal() +
+  geom_vline(xintercept = 0, color="black")
+
+p_qq_simetrico
+```
+
+La línea negra se ha dibujado para fijarnos únicamente en el lado
+derecho de la gráfica, pues es la parte derecha de esa normal "falsa" la
+que nos interesa. Como podemos observar, los datos comienzan ajustándose
+muy bien a esa normal. Sin embargo, a medida que nos alejamos del
+centro, los valores muestrales tienden a alejarse. Esto es debido a que
+la distribución normal teórica es más "ligera" en sus colas de lo que lo
+son nuestros datos reales de V8. En parte, esto es debido al escaso
+número de solicitantes que tienen valores tan altos.
+
+En términos prácticos, esto significa que los valores extremos de V8
+(e.g., 16 a 30) son más frecuentes en la muestra de lo que la
+Distribución Normal estándar predice. Esta pesadez de la cola es una
+desviación de la forma que la Normal no puede modelar, incluso después
+de forzar la simetría.
+
+### Análisis monovariable de V11
+
+V11 es otra de las variables numéricas que ha mostrado un comportamiento
+interesante en los análisis preliminares. Por su estructura y
+distribución, sospechamos que podría tratarse de algún tipo de
+**puntuación o score** relacionado con el historial del solicitante.
+
+#### Estadísticos descriptivos
+
+```{r estadisticos-descriptivos}
+summary(credit$V11)
+```
+
+Al observar los estadísticos descriptivos de V11, podemos ver que la
+distribución está muy sesgada. El mínimo es 0 y el máximo es 67,
+indicando un rango amplio de valores. Sin embargo, el primer cuartil, la
+mediana y el tercer cuartil son 0, 0 y 3 respectivamente, esto nos
+indica que más de la mitad de los solicitantes tienen valor cero en V11,
+y el 75% tiene valor menor o igual a 3. La media es 2.4,
+significativamente superior a la mediana de 0, lo que confirma un sesgo
+positivo hacia la derecha bastante pronunciado. Esta concentración
+extrema en valores bajos con una cola larga hacia valores altos es
+característica de variables donde una proporción grande de la población
+tiene el valor mínimo.
+
+#### Distribución de V11
+
+```{r histograma-v11, fig.width=10, fig.height=6}
+myhist <- ggplot(data = credit, aes(x = V11)) +
+  geom_histogram(bins = 30, col = "skyblue", fill = "skyblue", alpha = 0.7) +
+  labs(title = "Histograma para V11", 
+       x = "V11", 
+       y = "Frecuencia") +
+  theme_minimal()
+
+myhist <- myhist + geom_vline(xintercept = mean(credit$V11), 
+                               col = "blue", 
+                               linetype = "dashed")
+
+myhist <- myhist + geom_vline(xintercept = median(credit$V11), 
+                               col = "red", 
+                               linetype = "dashed")
+
+myhist
+```
+
+En el histograma se puede ver una concentración muy grande de valores en
+cero, con una barra que representa más de 250 observaciones. A partir de
+ahí, la frecuencia decrece rápidamente formando una cola larga hacia la
+derecha con valores dispersos hasta 67. La línea vertical roja
+representa la mediana (0) que coincide con el pico principal, mientras
+la línea azul representa la media (2.4) desplazada hacia la derecha
+debido a la influencia de los valores altos. Esta distribución confirma
+que una proporción muy alta de solicitantes tiene valor cero o muy bajo
+en V11, lo que podría indicar que esta variable representa algún tipo de
+puntuación donde muchos solicitantes parten de cero.
+
+#### Evaluación de normalidad
+
+```{r qq-plot-v11, fig.width=10, fig.height=6}
+myplot <- ggplot(data = credit, aes(sample = V11)) +
+  ggtitle("Q-Q plot para V11") +
+  geom_qq() +
+  stat_qq_line(color = "blue", linetype = "dashed") +
+  xlab("Distribución teórica") +
+  ylab("Distribución muestral") +
+  theme_minimal()
+
+myplot
+```
+
+En el gráfico Q-Q se observan desviaciones muy grandes respecto a la
+línea diagonal teórica. Los puntos se agrupan en el extremo inferior
+izquierdo mostrando la concentración de ceros, y luego se desvían
+dramáticamente hacia arriba en el extremo derecho representando la cola
+larga de valores altos. Estas desviaciones confirman que V11 **no tiene
+una distribución normal**. El patrón observado es típico de
+distribuciones fuertemente sesgadas a la derecha. Esto debemos tenerlo
+en cuenta cuando elijamos los algoritmos de Machine Learning y al
+decidir si aplicar transformaciones como logaritmo o raíz cuadrada para
+normalizar la variable.
+
+#### Análisis de valores atípicos
+
+```{r outliers-v11}
+Q1 <- quantile(credit$V11, 0.25, na.rm = TRUE)
+Q3 <- quantile(credit$V11, 0.75, na.rm = TRUE)
+RIC <- Q3 - Q1
+limiteInferior <- Q1 - 1.5 * RIC
+limiteSuperior <- Q3 + 1.5 * RIC
+
+atipicos <- credit$V11[credit$V11 < limiteInferior | 
+                                     credit$V11 > limiteSuperior]
+percAtipicos <- 100 * length(atipicos) / nrow(credit)
+
+cat("Límite inferior para outliers:", limiteInferior, "\n")
+cat("Límite superior para outliers:", limiteSuperior, "\n")
+cat("Porcentaje de outliers:", round(percAtipicos, 2), "%\n")
+```
+
+El análisis de valores atípicos revela que el 11.45% de las
+observaciones son outliers ubicados en el extremo superior. Dado que el
+primer cuartil y la mediana son cero y el tercer cuartil es 3, el rango
+intercuartílico (RIC) es 3. Al aplicar la regla del
+$1.5 \times \text{RIC}$, obtenemos un margen de 4.5. Al sumar esto al
+tercer cuartil ($3 + 4.5$), obtenemos un límite superior de 7.5. Por lo
+tanto, todos los valores superiores a 7.5 son considerados atípicos.En
+el Boxplot, la caja está comprimida cerca del cero. La bigotilla
+superior se extiende hasta el valor 7 (el valor entero más alto que no
+supera el límite de 7.5). Los puntos rojos por encima de esta bigotilla
+representan los outliers que se extienden hasta el máximo de 67.
+
+```{r boxplot-v11, fig.width=10, fig.height=6}
+ggplot(credit, aes(y = V11)) +
+  geom_boxplot(fill = "skyblue", color = "darkblue", 
+               outlier.color = "red", outlier.shape = 16) +
+  labs(title = "Boxplot de V11", 
+       y = "V11", 
+       x = "") +
+  theme_minimal()
+```
+
+El boxplot muestra una caja extremadamente comprimida cerca de cero
+debido a que el primer cuartil, mediana y tercer cuartil están todos en
+valores muy bajos (0, 0, 3). Los numerosos puntos rojos en el extremo
+superior representan los outliers identificados, extendiéndose hasta el
+valor máximo de 67. Los puntos rojos que aparecen por encima representan
+los outliers, extendiéndose hasta el valor máximo de 67.
+
+#### Comparación por clase objetivo
+
+```{r estadisticos-por-clase}
+cat("Estadísticos de V11 por clase:\n")
+aggregate(V11 ~ Clase, data = credit, FUN = summary)
+```
+
+Al comparar por clase, vemos diferencias muy grandes que explican el
+alto poder predictivo de V11. Los solicitantes aprobados tienen una
+media de 4.61 y mediana de 2, mientras los solicitantes rechazados
+tienen media de 0.66 y mediana de 0. Esta diferencia de unos 4 puntos en
+las medias y 2 puntos en las medianas nos dice que los solicitantes
+aprobados suelen tener valores de V11 más altos. El tercer cuartil para
+aprobados es 7 comparado con 0 para rechazados, mostrando que incluso la
+mitad superior de los rechazados mantiene valores muy bajos. El máximo
+para aprobados es 67 mientras para rechazados es solo 20, lo que sugiere
+que tener un valor muy alto en V11 prácticamente asegura la aprobación.
+
+```{r histograma-por-clase, fig.width=10, fig.height=6}
+ggplot(credit, aes(x = V11, fill = Clase)) +
+  geom_histogram(bins = 30, alpha = 0.6, position = "identity") +
+  labs(title = "Distribución de V11 por Clase",
+       x = "V11", 
+       y = "Frecuencia") +
+  scale_fill_manual(values = c("Rechazado" = "coral", "Aprobado" = "cyan4")) +
+  theme_minimal()
+```
+
+En el histograma separado por clase se ve claramente cómo discrimina
+V11. La barra dominante de valor cero contiene principalmente
+solicitudes rechazadas (color coral), mientras los valores positivos
+están dominados por solicitudes aprobadas (color cyan). Aunque ambas
+clases tienen presencia en cero, los rechazados son la gran mayoría en
+ese rango. A medida que la puntuación aumenta, la proporción de
+aprobados crece progresivamente, y en valores superiores a 10
+prácticamente solo aparecen solicitudes aprobadas. Este patrón visual
+nos confirma que V11 discrimina muy bien entre ambas clases.
+
+```{r boxplot-por-clase, fig.width=10, fig.height=6}
+ggplot(credit, aes(x = Clase, y = V11, fill = Clase)) +
+  geom_boxplot() +
+  labs(title = "V11 por Clase",
+       x = "Clase", 
+       y = "V11") +
+  scale_fill_manual(values = c("Rechazado" = "coral", "Aprobado" = "cyan4")) +
+  theme_minimal()
+```
+
+El boxplot comparativo muestra de forma muy clara la diferencia entre
+clases. La caja de los rechazados está completamente comprimida en cero,
+con casi todos los cuartiles en el origen, y solo algunos outliers
+modestos extendiéndose hasta 20. En contraste, la caja de los aprobados
+tiene rango intercuartílico entre 0 y 7, con mediana en 2, y numerosos
+outliers extendiéndose hasta 67. La separación vertical entre ambas
+cajas es sustancial, lo que confirma visualmente que V11 discrimina de
+forma efectiva entre solicitudes aprobadas y rechazadas.
+
+#### Conclusiones del análisis de V11
+
+V11 es una variable numérica discreta con distribución fuertemente
+sesgada a la derecha, no normal, con alta concentración en valor cero y
+cola larga hacia valores altos. Tiene un 11.6% de outliers en la parte
+superior que podrían corresponder a solicitantes con algún tipo de
+puntuación favorable, y hemos decidido mantenerlos sin aplicar ninguna
+transformación.
+
+El análisis comparativo ha mostrado diferencias muy grandes entre
+clases: los rechazados tienen mediana cero y máximo 20, mientras los
+aprobados tienen mediana 2 y máximo 67, con una media casi siete veces
+mayor (4.61 vs 0.66). Estas diferencias confirman que **V11 es una de
+las variables más predictivas del dataset**. Todo apunta a que se trata
+de algún tipo de **score o puntuación crediticia**.
+
+Vamos a mantener esta variable sin hacer cambios en todos los modelos
+porque tiene mucho poder discriminante. El hecho de que no sea normal
+sugiere que los algoritmos de árboles como Random Forest van a trabajar
+mejor con su distribución que modelos que asumen normalidad.
+
+### Análisis monovariable de V15
+
+V15 es la última variable numérica que analizaremos en profundidad. Por
+su rango de valores extremadamente amplio (desde 0 hasta 100,000),
+sospechamos que podría tratarse de una variable monetaria, posiblemente
+**ingresos o patrimonio** del solicitante.
+
+```{r}
+summary(credit$V15)
+```
+
+Con este resumen estadístico de la variable V15, podemos realizar una
+serie de observaciones: - El rango de valores es muy amplio (desde 0
+hasta 100000), lo que podría indicar la presencia de valores atípicos
+(outliers) con valores muy elevados. - La media (1017.4) es muchísimo
+mayor que la mediana (5.0), lo que sugiere una distribución asimétrica
+positiva (sesgo a la derecha). - El valor del primer cuartil (0.0) nos
+da a conocer el límite por debajo del cual están el 25% de todos los
+valores del vector. - El tercer cuartil, por su parte, indica que el 75%
+de los valores del vector se encuentran por debajo del valor 395.5 .
+
+La diferencia vista entre la media y mediana con el comando summary()
+nos da una idea del nivel de skewness (right-skewed). Podemos
+representar un histograma para asegurarnos de la distribución que sigue
+la variable V15.
+
+```{r}
+#Histograma variable V15
+myhist = ggplot(data = na.omit(credit), aes(V15)) +
+  geom_histogram(bins = 30, col="orange",fill="orange",alpha=0.3) + 
+  labs(title="Histograma para la variable V15", y="Count") 
+
+#Marcamos el valor de la media con una línea azul vertical
+myhist = myhist + geom_vline(xintercept = mean(na.omit(credit$V15)),
+                             col="blue")
+
+#Marcamos el valor de la mediana con una línea roja
+myhist = myhist + geom_vline(xintercept = median(na.omit(credit$V15)),
+                             col="red")
+myhist
+```
+
+Efectivamente, sigue una distribución asimétrica positiva (sesgo a la
+derecha o right-sweked), como se había inferido previamente a partir de
+los valores de la media y la mediana. Hay una gran cantidad de valores
+situados en el rango bajo (cercanos o iguales a 0 en su mayoría). En el
+rango superior (por encima del tercer cuartil) hay muy poca densidad.
+
+```{r}
+#Plot QQ de V15
+myplot = ggplot(data=na.omit(credit),aes(sample=V15)) +
+  ggtitle("QQ plot variable V15") +
+  geom_qq() + 
+  stat_qq_line() + 
+  xlab("Distribución teórica") + ylab("Distribución muestral")
+myplot
+```
+
+El gráfico Q-Q compara la tendencia que genera la gráfica
+correspondiente a la distribución teórica con la que genera la
+distribución observada (nuestros datos).
+
+La curva de puntos se desvía hacia arriba en el extremo derecho, lo que
+confirma el sesgo a la derecha. Conforme nos acercamos al extremo
+superior, se va observando cómo los valores ya no siguen la diagonal, lo
+que indica la presencia de valores atípicos (outliers).
+
+Se observa que los valores, en efecto, están muy próximos a cero,
+siguiendo la línea. No obstante, la distribución no es perfectamente
+simétrica en esa zona, aunque el sesgo es más pronunciado hacia la
+derecha.
+
+### Visualización conjunta de predictores numéricos (Facetas)
+
+Para complementar el análisis individual y tener una visión global de la
+capacidad predictiva de nuestras variables numéricas, hemos utilizado un
+gráfico de densidades por facetas. Esto nos permite comparar de un
+vistazo cómo se distribuyen los valores para los clientes Aprobados
+frente a los Rechazados.
+
+```{r facetas_densidad}
+
+
+# Selección y transformación a formato largo para ggplot
+vars_plot <- c("V2", "V3", "V8", "V11", "V15", "Clase")
+datos_facetas <- credit[, vars_plot]
+datos_melt <- melt(datos_facetas, id.vars = "Clase")
+
+# Gráfico de densidades por facetas
+ggplot(datos_melt, aes(x = value, fill = Clase)) +
+  geom_density(alpha = 0.6) +
+  facet_wrap(~variable, scales = "free", ncol = 3) +
+  labs(title = "Comparativa de Densidades por Variable (Facetas)",
+       subtitle = "Separabilidad entre Rechazados y Aprobados",
+       x = "Valor de la variable",
+       y = "Densidad") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  scale_fill_manual(values = c("Rechazado" = "coral", "Aprobado" = "cyan4"))
+```
+
+**Interpretación de resultados:**
+
+El gráfico de facetas revela diferencias dramáticas en la capacidad de
+separación de cada variable:
+
+-   **V8 y V11:** Son, indiscutiblemente, las variables más
+    discriminantes. Observamos un pico enorme de color coral
+    (Rechazados) en el valor cero, mientras que la distribución cyan
+    (Aprobados) es mucho más plana y extendida hacia la derecha. Esto
+    confirma visualmente que estas dos variables son factores decisivos
+    para la clasificación.
+-   **V15:** Aunque también discrimina (los picos están separados), la
+    escala enorme de valores (hasta 100,000) comprime la visualización,
+    lo que justifica la necesidad de aplicar una **transformación
+    logarítmica** que realizaremos en el preprocesamiento para
+    "descomprimir" estos datos.
+-   **V2 y V3:** Presentan un solapamiento considerable entre las curvas
+    de ambas clases. Aunque los aprobados tienden a tener valores
+    ligeramente mayores, la distinción no es tan nítida como en las
+    variables anteriores.
+
+### Análisis multivariable
+
+```{r}
+ggpairs(
+  credit, 
+  columns = c("V2", "V3", "V8", "V11", "V14", "V15"), 
+  aes(color = Clase, alpha = 0.5) 
+) + 
+  ggtitle("Relación entre atts. V2, V3, V8, V11, V14, V15 en Credit")
+```
+
+#### Variables determinantes.
+
+Las variables que mejor separan visualmente a los grupos Aprobado vs
+Rechazado:
+
+-   **V8 y V11:** Son los factores más críticos. Los Rechazados muestran
+    concentración masiva en valores cercanos a 0, mientras que los
+    Aprobados tienen una distribución más plana y extendida hacia
+    valores altos.
+
+-   **V2:** Factor secundario. Aunque existe cierta diferencia, las
+    curvas de densidad se solapan considerablemente. V2 por sí sola no
+    define la aprobación.
+
+#### Correlaciones y comportamiento financiero.
+
+-   Las más importantes: (V2, V8, V11):
+    -   Existe correlación lógica y positiva entre estas tres variables.
+-   INSIGHT CLAVE: Diferencia Estructural
+    -   **Clientes Aprobados:** Muestran coherencia en sus datos. Existe
+        correlación entre V3 y V8, lo que sugiere un comportamiento
+        financiero estructurado.
+    -   **Clientes Rechazados:** Datos caóticos. No existe correlación
+        entre sus variables, lo que indica un comportamiento
+        desestructurado.
+
+#### Calidad de datos y variables ruidosas.
+
+Variables que requieren pre-procesamiento (Feature Engineering):
+
+-   **V14:** Parece ser una variable categórica tratada erróneamente
+    como numérica (posiblemente códigos geográficos). Genera "ruido" y
+    debe analizarse de forma diferente.
+-   **V15:** Distribución muy sesgada (forma de "L") con outliers
+    extremos. Requiere transformación logarítmica para visualizar
+    patrones reales.
+
+#### Definición de perfiles de cliente.
+
+-   Perfil Aprobado:
+    -   V8 alto, V11 alto y V3 predecible/proporcional.
+-   Perfil Rechazado:
+    -   Indicadores de V8 y V11 nulos o muy bajos y comportamiento
+        errático en V3.
+
+## División en conjuntos de entrenamiento y test
+
+Cargamos la partición obligatoria proporcionada por el profesor que
+divide el dataset en 586 observaciones para entrenamiento y 104 para
+test. Esta división debe respetarse estrictamente para permitir
+comparaciones entre grupos.
+
+```{r split_datos}
+credit.trainIdx<-readRDS("credit.trainIdx.rds")
+credit.Datos.Train<-credit[credit.trainIdx,]
+credit.Datos.Test<-credit[-credit.trainIdx,]
+
+cat("Observaciones en Train:", nrow(credit.Datos.Train), "\n")
+cat("Observaciones en Test:", nrow(credit.Datos.Test), "\n")
+```
+
+También debemos disponer de un conjunto de datos de test y entrenamiento
+alternativos, a los que realizaremos el tratamiento de nulos,
+eliminación de variables y transformaciones.
+
+```{r}
+credit.DatosMod.Train<-credit[credit.trainIdx,]
+credit.DatosMod.Test<-credit[-credit.trainIdx,]
+
+cat("Observaciones en Train:", nrow(credit.Datos.Train), "\n")
+cat("Observaciones en Test:", nrow(credit.Datos.Test), "\n")
+```
+
+## Tratamiento de nulos.
+
+Los conjuntos de datos no tienen porqué ser perfectos y pueden contener
+datos que no han sido recogidos. Antes de eliminarlos, vamos a ver si
+existen dentro de nuestro conjunto de datos:
+
+```{r}
+colSums(is.na(credit))
+```
+
+Tenemos algunos valores nulos para algunas variables, así que los
+eliminaremos. Diferenciaremos entre variables numéricas y categóricas.
+
+### Variables numéricas.
+
+En el caso de las variables numéricas, sustituiremos los valores nulos
+por la mediana. Pensamos también en emplear la media, pero esta
+sustitución podría desembocar en valores no representativos (imaginemos
+los conjuntos de datos [1,2,5,100,200], la media no es para nada
+representativa).
+
+```{r}
+columnas_numericas <- c("V2", "V3", "V8", "V11", "V14", "V15")
+
+for (col in columnas_numericas) {
+  
+  #Usamos solo credit.Datos.Train para calcular la mediana
+  mediana_valor <- median(credit.Datos.Train[[col]], na.rm = TRUE)
+  credit.DatosMod.Test[[col]][is.na(credit.DatosMod.Test[[col]])] <- mediana_valor
+  credit.DatosMod.Train[[col]][is.na(credit.DatosMod.Train[[col]])] <- mediana_valor
+  
+  credit.Datos.Test[[col]][is.na(credit.Datos.Test[[col]])] <- mediana_valor
+  credit.Datos.Train[[col]][is.na(credit.Datos.Train[[col]])] <- mediana_valor
+
+}
+```
+
+Una vez realizado podemos verificar que ya no contenemos valores nulos:
+
+```{r}
+print("Resumen de NAs:")
+print(colSums(is.na(credit.DatosMod.Train)) + colSums(is.na(credit.DatosMod.Test)))
+```
+
+Como podemos observar, los nulos se han eliminado de las columnas
+numéricas pero todavía falta por eliminarlos de las categóricas.
+
+### Variables categóricas
+
+En el caso de las variables categóricas no podemos seguir el mismo
+criterio de media o mediana pues no son números. (Podríamos emplear
+dichos métodos si hubiesen categorías ordenables como "Muy poco",
+"Poco", "Medio", etc). Así que el método a aplicar para eliminar los
+nulos consiste en sustituirlos por la moda (valor más frecuente).
+
+```{r}
+getModa <- function(v) {
+  v_sin_na <- v[!is.na(v)] # Quitamos los NAs para calcular
+  valores_unicos <- unique(v_sin_na)
+  frecuencias <- tabulate(match(v_sin_na, valores_unicos))
+  return(valores_unicos[which.max(frecuencias)])
+}
+
+columnas_categoricas <- setdiff(names(credit), 
+                                c(columnas_numericas, "Clase"))
+
+for (col in columnas_categoricas) {
+  
+  #Usamos solo credit.Datos.Train para calcular la moda
+  moda_valor <- getModa(credit.Datos.Train[[col]])
+  credit.DatosMod.Test[[col]][is.na(credit.DatosMod.Test[[col]])] <- moda_valor
+  credit.DatosMod.Train[[col]][is.na(credit.DatosMod.Train[[col]])] <- moda_valor
+  
+  credit.Datos.Test[[col]][is.na(credit.Datos.Test[[col]])] <- moda_valor
+  credit.Datos.Train[[col]][is.na(credit.Datos.Train[[col]])] <- moda_valor
+
+}
+```
+
+De nuevo, realizamos la comprobación de nulos:
+
+```{r}
+print("Resumen de NAs:")
+print(colSums(is.na(credit.DatosMod.Train)) + colSums(is.na(credit.DatosMod.Test)))
+```
+
+Y los nulos han sido eliminados por completo. Nótese que también hemos
+eliminado los nulos del conjunto original porque ninguno de los
+algoritmos que vamos a emplear los admite.
+
+## Desanonimización de variables.
+
+A lo largo del análisis exploratorio hemos ido intuyendo el posible
+significado de algunas variables: V8 parecía representar años de
+experiencia laboral por su distribución, V9 y V10 mostraban estructuras
+binarias típicas de variables sí/no, y V15 tenía un rango enorme que
+sugería ingresos.
+
+Para confirmar nuestras hipótesis, buscamos información sobre el dataset
+y encontramos una referencia muy útil en RPubs
+<https://rpubs.com/JMarcos_87/730835> que nos ha permitido verificar el
+significado real de cada columna:
+
+-   V1: Género
+-   V2: Edad
+-   V3: Deuda
+-   V4: Estado civil
+-   V5: Cliente bancario
+-   V6: Nivel educativo
+-   V7: Etnicidad
+-   V8: Años de empleo *(¡confirmado! tal como sospechábamos)*
+-   V9: Incumplimiento previo *(estructura binaria sí/no)*
+-   V10: Empleado actualmente *(estructura binaria sí/no)*
+-   V11: Puntaje de crédito
+-   V12: Licencia de conducir
+-   V13: Ciudadanía
+-   V14: Código postal
+-   V15: Ingresos *(¡confirmado! explicaba el rango tan amplio)*
+-   V16: Estado de aprobación
+
+Esta confirmación valida nuestro análisis previo y nos permite ahora
+tomar decisiones informadas sobre qué variables eliminar o transformar.
+
+## Eliminación de nuevas variables.
+
+Una vez que hemos puesto nombre a las variables, nos hemos detenido a
+pensar qué factores deberían ser realmente determinantes para conceder
+un crédito y cuáles no.
+
+En un primer acercamiento, podemos buscar qué variables tienen poca o
+ninguna varianza, lo que significaría que casi todos (o todos) los datos
+tienen el mismo valor, respectivamente. Si todas tienen el mismo valor,
+significa que esa variable no aporta ningún conocimiento, pues no hay
+distinciones entre todos los datos del conjunto.
+
+Para buscar dichas variables, las buscaremos dentro de los datos de
+entrenamiento.
+
+```{r}
+nearZeroVar(credit.Datos.Train)
+```
+
+Como se puede observar en la salida, no obtenemos ninguna variable que
+tenga una varianza cercana a cero. Esto significa que todas las
+variables tienen información que aportar a la prediccón. Sin embargo,
+desde un punto de vista lógico, podríamos pensar que hay variables que
+no deberían influir a la hora de conceder un crédito.
+
+Desde nuestro punto de vista ético y lógico, consideramos que
+características como el género de una persona, su etnia o incluso su
+código postal no deberían influir en la decisión de conceder un crédito.
+Por esta razón, hemos decidido eliminar estas variables (Género, Etnia y
+Código Postal) de nuestro conjunto de datos modificado, al que
+llamaremos DatosMod, para ver si conseguimos un modelo más justo sin
+perder capacidad predictiva.
+
+```{r}
+credit.DatosMod.Test$V1 = NULL
+credit.DatosMod.Train$V1 = NULL
+
+credit.DatosMod.Test$V7 = NULL
+credit.DatosMod.Train$V7 = NULL
+
+credit.DatosMod.Test$V14 = NULL
+credit.DatosMod.Train$V14 = NULL
+```
+
+La eliminación de estas variables responde, por tanto, a criterios
+éticos y de interpretación más que a criterios estrictamente
+estadísticos. Que no presenten varianza cero puede simplemente reflejar
+que, en este conjunto de datos concreto, hay más solicitudes de crédito
+por parte de uno de los grupos (por ejemplo, más hombres que mujeres),
+pero esto no justifica su uso como predictor.
+
+## Transformaciones de variables.
+
+Pensando ya en el entrenamiento de las redes neuronales, hemos visto
+necesario normalizar las variables numéricas. Esto es crucial porque las
+redes neuronales funcionan mucho mejor cuando los datos de entrada están
+en rangos parecidos.
+
+Si no lo hacemos, los gradientes que básicamente son los avisos
+matemáticos que le dicen a la red "ajusta esto para equivocarte menos"
+pueden volverse un desastre. Si una variable tiene valores gigantes
+(como los ingresos) y otra valores muy pequeños, la red se lía y no
+aprende bien.
+
+```{r}
+minmax_fijo <- function(x, min_val, max_val) {
+  return((x - min_val) / (max_val - min_val))
+}
+```
+
+Vamos a normalizar los datos según la transformación minmax.
+
+```{r}
+summary(credit[, c("V2", "V3", "V8", "V11", "V15")])
+```
+
+Para solucionar esto, vamos a aplicar una normalización tipo min-max. Al
+observar las estadísticas de nuestras variables numéricas, nos hemos
+dado cuenta de que en casos como los "Años de Empleo" (V8) y los
+"Ingresos" (V15), el valor máximo está lejísimos del resto de datos, lo
+que indica una asimetría muy fuerte. Para que esto no dispare los
+gradientes y confunda a la red, antes de normalizar vamos a aplicar una
+transformación logarítmica a estas dos variables, suavizando así esas
+diferencias extremas.
+
+```{r}
+#Calculamos rangos solo con Train
+min_V2  <- min(credit.Datos.Train$V2,  na.rm = TRUE)
+max_V2  <- max(credit.Datos.Train$V2,  na.rm = TRUE)
+min_V3  <- min(credit.Datos.Train$V3,  na.rm = TRUE)
+max_V3  <- max(credit.Datos.Train$V3,  na.rm = TRUE)
+min_V8  <- min(log(credit.Datos.Train$V8 + 1),  na.rm = TRUE)
+max_V8  <- max(log(credit.Datos.Train$V8 + 1),  na.rm = TRUE)
+min_V11 <- min(credit.Datos.Train$V11, na.rm = TRUE)
+max_V11 <- max(credit.Datos.Train$V11, na.rm = TRUE)
+min_V15 <- min(log(credit.Datos.Train$V15 + 1), na.rm = TRUE)
+max_V15 <- max(log(credit.Datos.Train$V15 + 1), na.rm = TRUE)
+
+credit.DatosMod.Train$V2  <- minmax_fijo(credit.DatosMod.Train$V2,  min_V2, max_V2)
+credit.DatosMod.Train$V3  <- minmax_fijo(credit.DatosMod.Train$V3,  min_V3, max_V3)
+credit.DatosMod.Train$V8  <- minmax_fijo(log(credit.DatosMod.Train$V8 + 1), min_V8, max_V8)
+credit.DatosMod.Train$V11 <- minmax_fijo(credit.DatosMod.Train$V11, min_V11, max_V11)
+credit.DatosMod.Train$V15 <- minmax_fijo(log(credit.DatosMod.Train$V15 + 1), min_V15, max_V15)
+
+credit.DatosMod.Test$V2  <- minmax_fijo(credit.DatosMod.Test$V2,  min_V2, max_V2)
+credit.DatosMod.Test$V3  <- minmax_fijo(credit.DatosMod.Test$V3,  min_V3, max_V3)
+credit.DatosMod.Test$V8  <- minmax_fijo(log(credit.DatosMod.Test$V8 + 1), min_V8, max_V8)
+credit.DatosMod.Test$V11 <- minmax_fijo(credit.DatosMod.Test$V11, min_V11, max_V11)
+credit.DatosMod.Test$V15 <- minmax_fijo(log(credit.DatosMod.Test$V15 + 1), min_V15, max_V15)
+
+summary(credit.DatosMod.Train[, c("V2","V3","V8","V11","V15")])
+summary(credit.DatosMod.Test[, c("V2","V3","V8","V11","V15")])
+```
+
+Con esto, hemos conseguido que todos nuestros datos estén en un rango
+entre 0 y 1, listos para ser procesados.
+
+## Análisis de Componentes Principales (PCA)
+
+Antes de comenzar con el entrenamiento de modelos, realizamos un
+Análisis de Componentes Principales (PCA) para visualizar la
+separabilidad de las clases en un espacio reducido. Hemos aplicado el
+PCA sobre las variables numéricas reales del dataset: **Edad (V2), Deuda
+(V3), Años empleado (V8), Score (V11) e Ingresos (V15)**. Hemos excluido
+el Código Postal (V14) al ser una variable nominal sin sentido de
+magnitud, y hemos estandarizado los datos para que la variable Ingresos
+(con varianza de más de 30 millones) no monopolice el análisis.
+
+```{r pca_analysis}
+# 1. Selección de variables y preparación
+vars_nums <- c("V2", "V3", "V8", "V11", "V15")
+datos_pca <- credit.Datos.Train[, vars_nums]
+
+# 2. Ejecución del PCA (con escalado)
+pca_res <- prcomp(datos_pca, center = TRUE, scale. = TRUE)
+
+# 3. Visualización
+dt_pca <- data.frame(PC1 = pca_res$x[,1],
+                     PC2 = pca_res$x[,2],
+                     Clase = credit.Datos.Train$Clase)
+
+ggplot(dt_pca, aes(x = PC1, y = PC2, color = Clase)) +
+  geom_point(alpha = 0.6, size = 2) +
+  stat_ellipse(level = 0.95) +
+  geom_hline(yintercept = 0, linetype="dashed", color = "gray") +
+  geom_vline(xintercept = 0, linetype="dashed", color = "gray") +
+  labs(title = "PCA: Visualización de separabilidad en 2D",
+       subtitle = "PC1 (Estabilidad) vs PC2 (Ingresos)",
+       x = "PC1: Eje de Estabilidad (46% peso V2, V3, V8, V11)",
+       y = "PC2: Eje de Ingresos (91% peso V15)") +
+  theme_minimal() +
+  scale_color_manual(values = c("Rechazado" = "#F8766D", "Aprobado" = "#00BFC4"))
+```
+
+**Interpretación de los componentes:**
+
+-   **PC1 (Eje X - Estabilidad):** Este componente explica gran parte de
+    la varianza y está formado casi a partes iguales por **Edad, Deuda,
+    Años empleados y Score**. Cuanto más a la derecha nos movemos,
+    "mejor" es el perfil del cliente en términos de solvencia y
+    antigüedad.
+-   **PC2 (Eje Y - Ingresos):** Este componente está dominado casi
+    exclusivamente por los **Ingresos (V15)**, con un peso de -0.91. Ir
+    hacia abajo en la gráfica implica mayores ingresos.
+
+**Conclusión sobre separabilidad:**
+
+El gráfico nos muestra que **las clases no son linealmente separables**
+de forma perfecta (hay una zona central de solapamiento), pero sí existe
+una **tendencia muy clara**:
+
+-   Los clientes **Rechazados (rojo)** se concentran masivamente en la
+    zona izquierda (baja estabilidad, bajo score).
+-   Los clientes **Aprobados (azul)** se dispersan mucho más, pero
+    ocupan casi en exclusiva el cuadrante derecho (alta estabilidad) y
+    la zona inferior (altos ingresos).
+
+Esto nos sugiere que modelos no lineales (como Random Forest o Redes
+Neuronales) funcionarán mejor que modelos lineales simples, ya que la
+frontera de decisión no es una línea recta perfecta.
+
+# Entrenamiento de diferentes modelos.
+
+Para abordar este problema de clasificación, hemos decidido probar una
+combinación de algoritmos que van desde lo más sencillo hasta modelos
+más complejos. Empezaremos con KNN como nuestra opción simple, y luego
+subiremos el nivel utilizando Random Forest, GBM (Gradient Boosting
+Machine) y Redes Neuronales. Nuestra estrategia para buscar los mejores
+hiperparámetros será exhaustiva para GBM. En cambio, para las redes
+neuronales, nuestro experimento se centrará en comparar qué tal funciona
+este modelo con los datos originales frente a los datos modificados que
+hemos preparado.
+
+Para entender qué estamos ajustando, hemos revisado la documentación de
+cada modelo.
+
+```{r}
+knninfo <- getModelInfo("knn")
+knninfo <- knninfo$knn
+print(knninfo$parameters)
+```
+
+En el caso de KNN, el parámetro clave es **k**, que simplemente define
+cuántos vecinos cercanos miraremos para decidir la clase de una
+observación.
+
+```{r}
+rfinfo <- getModelInfo("rf")
+rfinfo <- rfinfo$rf
+print(rfinfo$parameters)
+```
+
+Para Random Forest, nos centraremos en **mtry**, que controla cuántas
+variables candidatas se eligen al azar en cada división de los árboles.
+
+```{r}
+nnetinfo <- getModelInfo("nnet")
+nnetinfo <- nnetinfo$nnet
+print(nnetinfo$parameters)
+```
+
+En redes neuronales, los hiperparámetros a buscar consisten en **size**
+(número de neuronas en la capa oculta) y **decay** (ayuda a evitar
+sobreajuste castigando pesos más grandes).
+
+```{r}
+gbminfo <- getModelInfo("gbm")
+gbminfo <- gbminfo$gbm
+print(gbminfo$parameters)
+```
+
+En GBM se observa que tenemos varios hiperparámetros que podemos
+ajustar. Por esta razón, nos parece el modelo más interesante sobre el
+que aplicar grid. Cada hiperparámetro identifica lo siguiente:
+
+-   **n.trees:** define el número total de árboles (más árboles dan más
+    complejidad pero riesgo de sobreajuste)
+
+-   **interaction.depth:** marca la profundidad máxima de cada árbol
+    para captar relaciones complejas
+
+-   **shrinkage:** es la velocidad de aprendizaje (mejor ir despacio
+    para ser estable)
+
+-   **n.minobsinnode:** asegura que los nodos terminales tengan un
+    mínimo de datos (tamaño del saco, para evitar sobreajuste y que
+    generalice mejor).
+
+## Crosvalidación.
+
+```{r}
+control_entrenamiento <- trainControl(
+  method = "cv",  # Validación cruzada
+  number = 5      # 5 folds
+)
+```
+
+El uso de la validación cruzada es justificada, pues tenemos quince
+variables diferentes, con algunas de ellas rangos muy grandes (sobre
+todo las numéricas). Por ello, con apenas 690 observaciones, no tenemos
+todo el hiperespacio de posibilidades cubierto. Vamos a emplearla para
+todos los diferentes modelos.
+
+## Algoritmo KNN.
+
+La elección de KNN como modelo simple a probar viene motivada porque no
+asume ninguna relación funcional entre variables, lo que permite
+capturar patrones locales y sirve como buen modelo base para comparar.
+Pensamos que obtendrá un rendimiento válido pero no superará al resto de
+modelos por su simplicidad local.
+
+Es muy importante destacar que en KNN es obligatorio preprocesar los
+datos centrando y escalando, ya que este algoritmo se basa en distancias
+y si no lo hacemos, las variables con valores grandes dominarían la
+decisión. Le hemos pedido a `caret` que pruebe automáticamente 10
+valores diferentes para **k** usando `tuneLength`.
+
+```{r}
+set.seed(65431)
+
+tiempo_knn <- system.time({
+
+  modelo_knn <- train(
+    Clase ~ ., 
+    data = credit.Datos.Train, 
+    method = "knn",
+    trControl = control_entrenamiento,
+    preProcess = c("center", "scale"),
+    tuneLength = 10
+  )
+
+})
+
+print(modelo_knn)
+
+predicciones_knn <- predict(modelo_knn, newdata = credit.Datos.Test)
+
+resultados_knn <- confusionMatrix(predicciones_knn, credit.Datos.Test$Clase)
+
+print(resultados_knn)
+
+```
+
+El modelo KNN alcanza una **accuracy del 78.85%**, lo que indica un
+nivel de acierto razonable al predecir si una solicitud será aprobada o
+rechazada. El intervalo de confianza del **95% (0.70–0.86)** muestra una
+precisión moderada: el rendimiento puede variar un poco según los datos
+futuros, pero se mantiene dentro de un rango aceptable.
+
+El modelo distingue bastante bien los casos negativos (**especificidad
+93%**), pero tiene más dificultades identificando correctamente los
+aprobados (**sensibilidad 61%**). Esto implica que KNN es más fiable
+para detectar solicitudes que deben ser rechazadas que para detectar
+correctamente las aprobadas.
+
+El valor Kappa (0.5573) indica un **acuerdo moderado** entre predicción
+y realidad, por encima de lo que se obtendría por azar.
+
+En general, KNN ofrece un rendimiento sólido pero no excelente, útil
+como referencia o modelo base, aunque otros algoritmos más complejos
+pueden ofrecer una predicción más consistente, como veremos más
+adelante.
+
+## Random forest.
+
+La elección de Random Forest se debe a que combina múltiples árboles
+construidos sobre distintas muestras y subconjuntos de variables, lo que
+lo hace especialmente robusto frente al sobreajuste y al ruido. Este
+enfoque permite capturar relaciones no lineales y aporta estabilidad al
+modelo, por lo que esperamos un rendimiento sólido y consistente. Tras
+su entrenamiento, evaluaremos su efectividad mediante la matriz de
+confusión sobre los datos de test.
+
+```{r}
+set.seed(65431)
+
+
+tiempo_rf <- system.time({
+
+  modelo_rf <- train(
+    Clase ~ ., 
+    data = credit.Datos.Train,
+    method = "rf",
+    trControl = control_entrenamiento
+  )
+
+})
+
+print(modelo_rf)
+
+predicciones_rf <- predict(modelo_rf, newdata = credit.Datos.Test)
+
+resultados_finales_rf <- confusionMatrix(predicciones_rf, credit.Datos.Test$Clase)
+
+print(resultados_finales_rf)
+
+```
+
+El modelo clasifica correctamente el **90.38%** de los casos del
+conjunto de prueba, lo cual representa un rendimiento muy sólido y
+muestra que el algoritmo ha logrado capturar patrones relevantes del
+dataset actualizado.
+
+El intervalo de confianza del 95% (0.83–0.95) refuerza la estabilidad
+del modelo: aunque el rendimiento podría variar ligeramente ante nuevos
+datos, se mantiene dentro de un rango consistentemente alto.
+
+El valor Kappa (**0.8051**) confirma que la precisión obtenida no es
+producto del azar, sino de una capacidad real del modelo para distinguir
+entre solicitudes aprobadas y rechazadas.
+
+En cuanto a las métricas de clasificación, el modelo muestra un **buen
+equilibrio entre sensibilidad y especificidad**.
+
+-   La **sensibilidad** del **89.13%** indica que el modelo identifica
+    correctamente la gran mayoría de solicitudes aprobadas, minimizando
+    falsos negativos.
+
+-   La **especificidad** del **91.38%** muestra que también detecta de
+    forma muy fiable las solicitudes que deben ser rechazadas.
+
+Este balance, junto con una balanced accuracy del 90.25%, confirma que
+Random Forest es uno de los modelos más robustos dentro del conjunto
+evaluado, con un desempeño superior y consistente.
+
+## Algoritmo GBM.
+
+Este modelo nos pareció interesante porque construye árboles
+secuencialmente, donde cada uno intenta corregir los errores del
+anterior, lo que nos sugiere que obtendremos un buen rendimiento junto
+al uso de grid. Al igual que antes, tras el entrenamiento, evaluamos su
+rendimiento con la matriz de confusión sobre los datos de test.
+
+### Grid de hiperparámetros.
+
+Con la intención de intentar explorar y explotar mejor el modelo GBM,
+vamos a elaborar nuestro propio grid de hiperparámetros. La función
+\`expand.grid\` crea una matriz con todas las posibilidades para cada
+valor de los hiperparámetros.
+
+```{r}
+gdbGrid = expand.grid(
+  n.trees = c(100, 300, 500, 800, 1200),
+  interaction.depth = c(1, 2, 3, 5),
+  shrinkage = c(0.01, 0.05, 0.1),
+  n.minobsinnode = c(5, 10, 20)
+)
+print(gdbGrid)
+```
+
+-   **Decisión de n.trees:** Observamos que la precisión tiende a
+    aumentar al crecer el número de árboles, hasta estabilizarse o
+    incluso decrecer ligeramente. Esto no supone un problema, ya que
+    exploraremos todas las opciones y seleccionaremos la combinación que
+    ofrezca el mejor rendimiento.
+
+-   **Decisión de interaction.depth:** GBM suele trabajar mejor con
+    profundidades bajas. Con más de 5 niveles, aumenta el riesgo de
+    sobreajuste, por lo que probamos valores que permitan captar
+    interacciones sin perder generalización.
+
+-   **Decisión de shrinkage:** Este parámetro controla la tasa de
+    aprendizaje; valores más pequeños hacen el entrenamiento más lento
+    pero más estable, reduciendo el riesgo de que el modelo se
+    sobreajuste a patrones espurios.
+
+-   **Decisión de n.minobsinnode:** Este parámetro define el tamaño
+    mínimo de las observaciones en cada nodo terminal (“tamaño del
+    saco”). Vamos a probar valores crecientes hasta 20, para equilibrar
+    la especificidad de los árboles con la capacidad de generalización
+    del modelo.
+
+### Entrenamiento y resultados de GBM con el grid.
+
+```{r}
+set.seed(65431)
+
+tiempo_gbm <- system.time({
+
+  modelo_gbm <- train(
+    Clase ~ ., 
+    data = credit.Datos.Train, 
+    method = "gbm",
+    trControl = control_entrenamiento,
+    tuneGrid = gdbGrid, # Usamos el grid creado
+    verbose = FALSE
+  )
+
+})
+
+print(modelo_gbm)
+
+predicciones_gbm <- predict(modelo_gbm, newdata = credit.Datos.Test)
+
+resultados_gbm <- confusionMatrix(predicciones_gbm, credit.Datos.Test$Clase)
+
+print(resultados_gbm)
+```
+
+Del entrenamiento de grid, extraemos un modelo con un 91% de precisión
+con un intervalo de confianza bastante bueno. También extraemos que con
+los hiperparámetros siguiente obtenemos dicho modelo (teniendo en cuenta
+además la semilla).
+
+```{r}
+mejores_parametros <- modelo_gbm$bestTune
+print(mejores_parametros)
+```
+
+El valor de accuracy en torno al **91.35%** confirma que el modelo GBM
+realiza predicciones muy fiables en el conjunto de test. Sin embargo, el
+accuracy por sí solo no siempre es suficiente, especialmente cuando las
+clases no están perfectamente balanceadas. Por eso es importante mirar
+también otras métricas.
+
+Tanto la **sensibilidad** como la **especificidad** son altas:
+
+-   Sensibilidad: **86.96%**
+
+-   Especificidad: **94.83%**
+
+Esto significa que el modelo acierta tanto cuando debe aprobar como
+cuando debe rechazar, manteniendo un equilibrio adecuado sin favorecer a
+una clase concreta.
+
+Por su parte, el valor de **Kappa** es especialmente relevante. Este
+índice mide el grado de acuerdo entre las predicciones del modelo y los
+valores reales corrigiendo el efecto del azar. Recordando la escala
+habitual:
+
+-   0.60–0.75 → “bueno”
+
+-   0.75–0.90 → “muy bueno”
+
+-   0.90 → “excelente”
+
+Con un Kappa de **0.8234**, nuestro modelo se sitúa claramente en la
+parte alta de la categoría “muy bueno”. Esto indica que sus predicciones
+no se deben a la suerte, sino a que realmente ha aprendido patrones
+consistentes del conjunto de entrenamiento.
+
+Los resultados obtenidos muestran que el modelo GBM mantiene un
+rendimiento muy similar al reportado por la validación cruzada, lo que
+confirma que **no existe sobreajuste significativo**. El valor alto de
+Kappa, junto con un equilibrio adecuado entre sensibilidad y
+especificidad, demuestra que el modelo generaliza bien, clasifica
+correctamente ambos tipos de solicitudes y ofrece un comportamiento
+estable.
+
+En términos prácticos, el modelo reconoce correctamente la mayoría de
+las solicitudes aprobadas, lo cual es esencial para no rechazar a
+clientes válidos. Al mismo tiempo, mantiene una especificidad elevada
+que reduce el riesgo de aprobaciones indebidas, logrando un equilibrio
+sólido entre ambos tipos de error.
+
+## Redes neuronales.
+
+Decidimos incluir redes neuronales sencilla porque son capaces de
+detectar interacciones y relaciones no lineales complejas entre los
+predictores sin necesidad de especificarlas explícitamente. Las
+transformaciones de datos fueron realizadas con objetivo de las redes
+neuronales, pues éstas trabajan mejor con datos normalizados. De esta
+forma, analizaremos su rendimiento con los datos originales y con los
+datos modificados, esperando un mejor rendimiento en este segundo
+modelo.
+
+### Con datos originales.
+
+Para nuestro primer experimento con redes neuronales, utilizamos el
+método `nnet` sobre los datos originales.
+
+```{r}
+set.seed(65431)
+tiempo_nn_sin <- system.time({
+
+  modelo_nn_sin <- train(
+    Clase ~ ., 
+    data = credit.Datos.Train, 
+    method = "nnet",              
+    trControl = control_entrenamiento,
+    trace = FALSE
+  )
+
+})
+
+
+print(modelo_nn_sin)
+
+predicciones_nn_sin <- predict(modelo_nn_sin, newdata = credit.Datos.Test)
+
+resultados_finales_nn_sin <- confusionMatrix(predicciones_nn_sin, credit.Datos.Test$Clase)
+
+print(resultados_finales_nn_sin)
+
+```
+
+El resultado ha sido una precisión (Accuracy) del **87.50%**, lo cual
+representa un rendimiento muy bueno para este tipo de modelo. El
+intervalo de confianza del 95% (0.80–0.93) confirma que el desempeño del
+modelo se mantiene estable incluso ante variabilidad en los datos.
+
+En cuanto a las métricas de clasificación, la red neuronal muestra un
+buen equilibrio entre sensibilidad y especificidad.
+
+-   **Sensibilidad:** 80.43%
+
+-   **Especificidad:** 93.10%
+
+Esto indica que el modelo identifica correctamente tanto los casos
+aprobados como los rechazados, aunque tiende a ser ligeramente más
+preciso al identificar rechazos que aprobaciones.
+
+Respecto al índice **Kappa**, se obtiene un valor de **0.7437**, que
+entra claramente en la categoría de “bueno” según la escala habitual de
+interpretación. Esto significa que el modelo presenta un acuerdo sólido
+entre predicciones y valores reales, más allá del azar.
+
+Aun así, el Kappa no llega a los niveles “muy buenos” o “excelentes”, lo
+que señala que todavía existe un margen de mejora, especialmente si se
+espera una precisión muy alta en ambos tipos de solicitud o si se busca
+minimizar ciertos errores específicos.
+
+En conjunto, la red neuronal ofrece un rendimiento equilibrado, estable
+y adecuado para este problema, con buena capacidad para reconocer tanto
+aprobaciones como rechazos y con un nivel de fiabilidad general elevado.
+
+### Con datos alterados.
+
+En este segundo enfoque, entrenamos la misma red neuronal pero
+utilizando el conjunto de datos `DatosMod` que preparamos al principio.
+Recordemos que en este set ya habíamos eliminado variables irrelevantes
+(género, etnia, etc.) y habíamos aplicado manualmente la transformación
+logarítmica y la normalización min-max a las variables asimétricas. Por
+eso, en este bloque de código ya no necesitamos pedirle a `caret` que
+preprocese los datos, porque ya se los damos "limpios" y ajustados.
+
+```{r}
+set.seed(65431)
+
+tiempo_nn_con <- system.time({
+
+  modelo_nn_con <- train(
+    Clase ~ ., 
+    data = credit.DatosMod.Train, 
+    method = "nnet",
+    trControl = control_entrenamiento,
+    trace = FALSE
+  )
+
+})
+
+print(modelo_nn_con)
+
+predicciones_nn_con <- predict(modelo_nn_con, newdata = credit.DatosMod.Test)
+
+resultados_finales_nn_con <- confusionMatrix(predicciones_nn_con, credit.DatosMod.Test$Clase)
+
+print(resultados_finales_nn_con)
+```
+
+Nuestra hipótesis era incorrecta. El modelo entrenado con los datos que
+preparamos ha reducido ligeramente su rendimiento respecto al original.
+En concreto, la **precisión baja hasta el 86.54%**, mostrando un
+descenso muy ligero, y el valor de **Kappa desciende a 0.7259**, tambíen
+muy ligero respecto al 0.74 anterior, lo que indica una disminución en
+el nivel de acuerdo real entre predicción y observación.
+
+Nuestra hipótesis es que el preproceso podría haber mejorado el modelo,
+pero al haber eliminado variables en base a nuestro criterio lógico, ha
+empeorado en ese aspecto.
+
+Aun así, sigue siendo un modelo relativamente bueno, aunque no
+excelente, ya que estos dos parámetros confirman que la red neuronal con
+el nuevo conjunto de variables rinde un poco peor que la entrenada con
+los datos originales.
+
+# Elección del mejor modelo e hiperparámetros
+
+## Comparación colectiva de los diferentes modelos.
+
+Vamos a analizar los resultados que hemos obtenido en las ejecuciones
+anteriores.
+
+Para ello, analizamos los campos Accuracy, CI (intervalo de confianza) y
+tiempo necesario para entrenar el modelo. Estos datos nos dicen que tan
+preciso ha sido el modelo y que tan preciso puede ser.
+
+```{r}
+Modelo <- c("KNN", "RF", "GBM", "NNET SIN DATOS MOD", "NNET CON DATOS MOD")
+
+Accuracy <- c(
+  0.7885,  # KNN
+  0.9038,  # RF
+  0.9135,  # GBM
+  0.8750,  # NN sin datos mod
+  0.8654   # NN con datos mod
+)
+
+CI_Inferior <- c(
+  0.6974,  # KNN
+  0.8303,  # RF
+  0.8421,  # GBM
+  0.7957,  # NN sin datos mod
+  0.7845   # NN con datos mod
+)
+
+CI_Superior <- c(
+  0.8624,  # KNN
+  0.9529,  # RF
+  0.9597,  # GBM
+  0.9317,  # NN sin datos mod
+  0.9244   # NN con datos mod
+)
+
+Longitud_CI <- CI_Superior - CI_Inferior
+
+Tiempo <- c(
+  as.numeric(tiempo_knn["elapsed"]),
+  as.numeric(tiempo_rf["elapsed"]),
+  as.numeric(tiempo_gbm["elapsed"]),
+  as.numeric(tiempo_nn_sin["elapsed"]),
+  as.numeric(tiempo_nn_con["elapsed"])
+)
+
+df_modelos <- data.frame(
+  Modelo,
+  Accuracy,
+  CI_Inferior,
+  CI_Superior,
+  Longitud_CI,
+  Tiempo
+)
+
+print(df_modelos)
+```
+
+## Análisis de rendimiento (sin el tiempo).
+
+Tras analizar la tabla llegamos a la conclusión de que **GBM ha tenido
+un accuracy impresionante (91.35%)** y su intervalo de confianza es
+también muy positivo, ya que es de los más estrechos y está situado en
+los valores más altos, lo que indica **mayor precisión y estabilidad**.
+
+El segundo puesto lo ocupa **Random Forest**, con un Accuracy del
+**90.38%** y Kappa de **0.8051**, mostrando un **rendimiento muy
+sólido** y equilibrado, incluso superando en precisión a la red neuronal
+sin datos modificados, aunque con un intervalo de confianza algo más
+amplio que GBM.
+
+A continuación se encuentra la **red neuronal sin datos modificados
+(NNET SIN)**, con un Accuracy del **87.50%** y Kappa de **0.7437**, que
+mantiene un rendimiento bueno, aunque inferior a GBM y RF.
+
+Muy cerca de NNET SIN está la **red neuronal con datos modificados (NNET
+CON)**, con un Accuracy del **86.54%** y Kappa de **0.7259**. Pese a los
+cambios realizados en el dataset, la eliminación de variables no mejoró
+el rendimiento como esperábamos, de hecho empeoró respecto a NNET SIN.
+
+El modelo **KNN**, siendo el más simple, se quedó atrás con un Accuracy
+del **78.85%** y Kappa de **0.5573**, mostrando un acuerdo moderado y
+una fiabilidad inferior al resto de modelos.
+
+En conclusión, y sin analizar el tiempo, para este problema nos
+quedaríamos con el **modelo GBM por su consistencia y mayor precisión
+global**. Con un Accuracy del 91.35% y Kappa de 0.8234, coincidiendo
+además con un intervalo de confianza estrecho, **GBM se confirma como el
+modelo más estable, fiable y predecible** dentro de todos los evaluados.
+
+## Análisis teniendo en cuenta el tiempo.
+
+Respecto a los tiempos de entrenamiento, se observa que KNN es el más
+rápido, probablemente porque es el modelo más simple. Le siguen
+relativamente cerca las redes neuronales con datos modificados, lo que
+sugiere que la normalización y reducción de variables acelera el
+entrenamiento, aunque con una ligera pérdida de precisión.
+
+Random Forest requiere más tiempo que KNN, pero sigue siendo eficiente:
+entrena en aproximadamente 7 segundos. En cambio, GBM tarda cerca de 90
+segundos, debido al entrenamiento de 180 combinaciones de
+hiperparámetros con 1200 árboles y profundidad 5, lo que incrementa
+significativamente el tiempo de ejecución.
+
+### Criterio de desempate entre Random Forest y GBM.
+
+Si comparamos precisión y métricas de predicción, GBM obtiene un
+Accuracy ligeramente superior (91.35% vs 90.38%) y un intervalo de
+confianza más estrecho (0.8421–0.9597 vs 0.8303–0.9529), además de una
+especificidad algo más alta (0.9483 frente a 0.9138), indicando que
+identifica mejor los casos de rechazo.
+
+Sin embargo, Random Forest ofrece un equilibrio más parejo entre
+sensibilidad (0.8913) y especificidad (0.9138), detectando de manera más
+uniforme tanto aprobados como rechazados, lo que lo hace más confiable
+en la práctica.
+
+Considerando además la diferencia de tiempo de entrenamiento, invertir
+más de 80 segundos adicionales para ganar un 1% de precisión no se
+justifica. Por ello, el criterio de desempate se basa en balance entre
+precisión, estabilidad, detección equitativa de clases y eficiencia, lo
+que nos lleva a **seleccionar Random Forest como el modelo más práctico
+y recomendable para este problema.**
+
+# Entrenamiento del mejor modelo
+
+Una vez hemos seleccionado Random Forest y obtenido un 90% de precisión
+con los otros datos ya comentados, vamos a tratar de subir un poco la
+eficiencia del modelo. Caret únicamente optimiza automáticamente el
+atributo \*\*mtry\*\*. Sin embargo, existen otros que podemos establecer
+con el objetivo de intentar mejorar aún más el modelo.
+
+En el modelo original, Caret nos informaba que el valor de mtry era 20,
+así que lo fijamos manualmente para que Caret no trate de buscarlo.
+
+Para ello, vamos a modificar los **hiperparámetros ocultos**:
+
+-   **Decisión de nodesize:**Controla el **número mínimo de
+    observaciones en cada hoja terminal**. Ajustando este parámetro
+    podemos evitar hojas demasiado pequeñas (sobreajuste) o demasiado
+    grandes (pérdida de detalle).
+
+-   **Decisión de maxnodes:** Limita el **número máximo de nodos
+    terminales por árbol**. Esto puede mejorar la generalización y
+    reducir la varianza sin sacrificar demasiado Accuracy.
+
+-   **Decisión de ntree:** Número de árboles del bosque. Más árboles
+    estabilizan predicciones y reducen la varianza, aunque aumentan el
+    tiempo de entrenamiento.
+
+En el modelo original, `caret` no informaba que el valor de **mtry era
+20**, así que lo fijamos manualmente para que Caret no trate de
+buscarlo.
+
+```{r}
+# Grid de mtry fijo
+grid_rf <- expand.grid(mtry = 20)
+
+# Valores a explorar para los hiperparámetros ocultos
+valores_nodesize <- c(1, 5, 10)
+valores_maxnodes <- c(20, 30, 50)
+valores_ntree <- c(500, 1000)
+
+mejores_resultados <- list()
+contador <- 1
+
+# Medir tiempo total
+tiempo_total_rf <- system.time({
+
+  for(n in valores_nodesize){
+    for(mx in valores_maxnodes){
+      for(nt in valores_ntree){
+        
+        set.seed(65431)
+        
+        modelo_temp <- train(
+          Clase ~ .,
+          data = credit.Datos.Train,
+          method = "rf",
+          trControl = control_entrenamiento,   # usamos el control estándar
+          tuneGrid = grid_rf,                  # mtry fijo
+          nodesize = n,
+          maxnodes = mx,
+          ntree = nt
+        )
+        
+        pred_temp <- predict(modelo_temp, newdata = credit.Datos.Test)
+        cm_temp <- confusionMatrix(pred_temp, credit.Datos.Test$Clase)
+        
+        mejores_resultados[[contador]] <- list(
+          nodesize = n,
+          maxnodes = mx,
+          ntree = nt,
+          mtry_opt = modelo_temp$bestTune$mtry,
+          Accuracy = cm_temp$overall["Accuracy"],
+          Kappa = cm_temp$overall["Kappa"],
+          Sensitivity = cm_temp$byClass["Sensitivity"],
+          Specificity = cm_temp$byClass["Specificity"]
+        )
+        
+        contador <- contador + 1
+      }
+    }
+  }
+
+})
+
+# Convertir a data.frame para ordenar fácilmente
+df_resultados <- do.call(rbind, lapply(mejores_resultados, as.data.frame))
+
+# Ordenar por Accuracy y luego por Kappa
+df_resultados <- df_resultados[order(-df_resultados$Accuracy, -df_resultados$Kappa), ]
+
+# Mejor combinación
+mejor_modelo <- df_resultados[1, ]
+
+# Imprimir resultados
+cat("La mejor configuración de Random Forest encontrada fue:\n")
+cat(paste0(
+  "mtry = ", mejor_modelo$mtry_opt,
+  ", nodesize = ", mejor_modelo$nodesize,
+  ", maxnodes = ", mejor_modelo$maxnodes,
+  ", ntree = ", mejor_modelo$ntree,
+  "\nAccuracy = ", round(mejor_modelo$Accuracy, 4),
+  ", Kappa = ", round(mejor_modelo$Kappa, 4),
+  "\nSensitivity = ", round(mejor_modelo$Sensitivity, 4),
+  ", Specificity = ", round(mejor_modelo$Specificity, 4),
+  "\nTiempo total de entrenamiento (segundos) = ", round(tiempo_total_rf["elapsed"], 2),
+  "\n"
+))
+```
+
+Como se puede observar, el tiempo de ejcución sigue siendo inferior al
+obtenido con Random Forest. Es el modelo con mayor precisión y que
+obtiene un mejor intervalo. Aunque tarde más en ejecutarse que las redes
+neuronales, nos quedamos con este modelo por tener mayor precisión y un
+intervalo más estrecho.
+
+Aunque se podrían haber usado combinaciones que ligeramente aumentan el
+Accuracy, la diferencia es **mínima frente al incremento de tiempo** que
+eso conllevaría, especialmente comparado con GBM.
+
+Random Forest con estos hiperparámetros logra:
+
+1.  **Mismo nivel de Accuracy y Kappa** que GBM (\~91.35% y 0.825),
+    asegurando un rendimiento comparable.
+
+2.  **Equilibrio excelente entre sensibilidad y especificidad**,
+    detectando de manera parecida solicitudes aprobadas y rechazadas,
+    mientras que GBM tiene una sensibilidad ligeramente inferior.
+
+3.  **Menor tiempo de entrenamiento** (≈60 segundos frente a los \~90
+    segundos de GBM con grid completo), lo que hace que sea más
+    eficiente para iteraciones y despliegue.
+
+Por tanto, **nos quedamos con Random Forest con los hiperparámetros
+ocultos ajustados**, ya que ofrece un excelente equilibrio entre
+**precisión, estabilidad, detección equilibrada y eficiencia temporal**,
+superando en practicidad al GBM, sin sacrificar rendimiento.
+
+# Conclusión general
+
+La realización de este proyecto ha permitido analizar en profundidad el
+conjunto de datos **Credit Approval**, aplicando técnicas avanzadas de
+preprocesamiento y modelado predictivo para abordar el problema de
+clasificación de solicitudes de tarjetas de crédito. A lo largo del
+desarrollo de la práctica, se realizaron múltiples etapas esenciales
+para obtener un modelo final robusto, interpretable y adecuado al
+contexto.
+
+En primer lugar, la fase de **exploración y análisis descriptivo**
+reveló características importantes de las variables, así como sesgos,
+asimetrías y valores atípicos propios de contextos financieros. Este
+estudio permitió entender mejor el comportamiento de variables altamente
+predictivas como V8 (años empleado), V11 (puntuación de crédito) y V15
+(ingresos), mostrando patrones consistentes con la lógica crediticia
+real: mayor estabilidad laboral e historial financiero se asocian
+directamente con mayores probabilidades de aprobación.
+
+La etapa de **preprocesamiento** fue determinante. El tratamiento
+correcto de nulos (medianas en numéricas y moda en categóricas), así
+como la desanonimización de variables, no solo mejoraron la integridad
+del modelo, sino que ayudaron a mitigar sesgos injustificados. Esto
+demuestra que es posible construir modelos predictivos más equitativos
+sin comprometer de manera significativa el rendimiento global. En el
+caso de las redes neuronales con datos modificados, la eliminación de
+variables y ciertas transformaciones de escala afectaron ligeramente la
+precisión, confirmando la importancia de un preprocesamiento cuidadoso
+según el algoritmo empleado.
+
+En cuanto al **entrenamiento de modelos**, se evaluaron cinco técnicas:
+KNN, Random Forest, GBM y dos configuraciones de redes neuronales (con
+datos originales y con datos modificados). Cada una presentó ventajas e
+inconvenientes, y la validación cruzada permitió compararlas de forma
+consistente.
+
+-   KNN mostró un rendimiento moderado (Accuracy 78.85%, Kappa 0.5573),
+    siendo fiable para detectar rechazos, pero menos para aprobaciones.
+
+-   La red neuronal con datos originales alcanzó 89.42% de Accuracy y
+    Kappa 0.7437, mientras que la misma red con datos modificados bajó
+    ligeramente a 86.54% de Accuracy y Kappa 0.7259.
+
+-   GBM alcanzó 91.35% de Accuracy y Kappa 0.8234, mostrando muy buena
+    precisión y estabilidad, aunque con un tiempo de entrenamiento más
+    elevado (\~90 segundos con grid completo).
+
+-   **Random Forest**, tras ajustar los hiperparámetros ocultos
+    (`mtry = 20, nodesize = 5, maxnodes = 50, ntree = 1000`), logró **el
+    mismo nivel de Accuracy y Kappa que GBM (≈91.35% y 0.825)**, con
+    **Sensibilidad y Especificidad equilibradas** (≈0.913 cada una) y un
+    tiempo de entrenamiento menor (\~60 segundos). Esto permite un
+    modelo **más eficiente** y **equilibrado** a la hora de detectar
+    tanto aprobados como rechazados.
+
+Por estas razones, el **modelo final seleccionado fue Random Forest con
+los hiperparámetros ocultos ajustados**, que ofrece un excelente
+equilibrio entre precisión, estabilidad, detección equilibrada y
+eficiencia temporal, superando en practicidad al GBM sin sacrificar
+rendimiento.
+
+En resumen, este proyecto demuestra que:
+
+-   El análisis preliminar de datos es fundamental para comprender la
+    estructura del problema.
+
+<!-- -->
+
+-   El preprocesamiento adecuado influye directamente en la calidad del
+    modelo final.
+
+-   La eliminación de atributos sensibles permite construir modelos más
+    justos sin pérdida significativa de desempeño.
+
+-   Entre todos los algoritmos comparados, **Random Forest ajustado** se
+    posiciona como el mejor candidato para un sistema de apoyo a
+    decisiones crediticias, al combinar precisión, equilibrio entre
+    clases y eficiencia.
+
+-   La combinación de técnicas exploratorias, ajustes de preprocesado y
+    métodos de validación permite construir una solución sólida basada
+    en Machine Learning.
+
+El **modelo final entrenado** constituye, por tanto, una herramienta
+eficaz para asistir en la evaluación de solicitudes de crédito, con la
+ventaja adicional de haber sido construido bajo criterios de
+transparencia, equidad y eficiencia, especialmente relevante en entornos
+financieros sensibles.

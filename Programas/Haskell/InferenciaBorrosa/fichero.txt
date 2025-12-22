@@ -1,0 +1,2 @@
+Vl {nombre = "X", numCon = 4, et = ["Grande", "Pequena"], m = [("Grande",  [(1, 0.0), (2, 0.2), (3, 0.7), (4, 1.0)]),("Pequena", [(1, 1.0), (2, 0.8), (3, 0.7), (4, 0.0)])]}
+Vl {nombre = "Y", numCon = 3, et = ["Pequena"], m = [("Pequena", [(1, 1.0), (2, 0.5), (3, 0.1)])]}

@@ -1,0 +1,159 @@
+; Wed Nov 19 18:30:28 CET 2025
+; 
+;+ (version "3.4.8")
+;+ (build "Build 629")
+
+([ComplejoQRS] of  %3ASTANDARD-CLASS
+
+	(%3ASLOT-CONSTRAINTS
+		[DSI_ONT_OPC_DSI%28nt%29_Class20021]
+		[DSI_ONT_OPC_DSI%28nt%29_Class20022]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class1] of  OndaP
+
+	(ciclo 1)
+	(picoMaximo 0.27989623)
+	(tFin 100)
+	(tInicio 0.0))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20013] of  IntervaloPR
+
+	(acabaConSegmentoPR [DSI_ONT_OPC_DSI%28nt%29_Class20016])
+	(comienzaConOndaP [DSI_ONT_OPC_DSI%28nt%29_Class1])
+	(duracionInter 190))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20015] of  IntervaloQT
+
+	(continuaConSegmentoST [DSI_ONT_OPC_DSI%28nt%29_Class20017])
+	(duracionInter 400)
+	(empiezaConComplejoQRS [DSI_ONT_OPC_DSI%28nt%29_Class20018])
+	(terminaConOndaT [DSI_ONT_OPC_DSI%28nt%29_Class8]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20016] of  SegmentoPR
+
+	(duracionSegm 90)
+	(empiezaDespuesDeOndaP [DSI_ONT_OPC_DSI%28nt%29_Class1])
+	(terminaAntesDeComplejoQRS [DSI_ONT_OPC_DSI%28nt%29_Class20018]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20017] of  SegmentoST
+
+	(comienzaDespuesDeComplejoQRS [DSI_ONT_OPC_DSI%28nt%29_Class20018])
+	(duracionSegm 140)
+	(terminaAntesDeOndaT [DSI_ONT_OPC_DSI%28nt%29_Class8]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20018] of  ComplejoQRS
+
+	(continuaConOndaR [DSI_ONT_OPC_DSI%28nt%29_Class6])
+	(duracion 90)
+	(empiezaConOndaQ [DSI_ONT_OPC_DSI%28nt%29_Class5])
+	(terminaConOndaS [DSI_ONT_OPC_DSI%28nt%29_Class7]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20021] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "Comprobación de que en un ComplejoQRS la OndaQ va antes en tiempo que la OndaR.")
+	(%3APAL-NAME "ondaQAntesDeOndaR")
+	(%3APAL-RANGE "(defrange ?comp :FRAME ComplejoQRS)")
+	(%3APAL-STATEMENT "(forall ?comp\n       (=> (and \n                                 (own-slot-not-null empiezaConOndaQ ?comp)\n                                                  (own-slot-not-null continuaConOndaR ?comp)\n                                                  (own-slot-not-null tFin (empiezaConOndaQ ?comp))\n                                                  (own-slot-not-null tInicio (continuaConOndaR ?comp))\n               )\n               (= (tFin (empiezaConOndaQ ?comp))\n                   (tInicio (continuaConOndaR ?comp)))\n           )\n)"))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20022] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "Comprobación de que en un ComplejoQRS la OndaR va antes en tiempo que la OndaS.")
+	(%3APAL-NAME "ondaRAntesDeOndaS")
+	(%3APAL-RANGE "(defrange ?comp :FRAME ComplejoQRS)")
+	(%3APAL-STATEMENT "(forall ?comp\n        (=> (and \n                 (own-slot-not-null terminaConOndaS ?comp)\n                 (own-slot-not-null continuaConOndaR ?comp)\n                 (own-slot-not-null tInicio (terminaConOndaS ?comp))\n                 (own-slot-not-null tFin (continuaConOndaR ?comp))\n            )\n            (= (tFin (continuaConOndaR ?comp))\n               (tInicio (terminaConOndaS ?comp)))\n        )\n)"))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20025] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "La amplitud de una OndaQ es siempre negativa.")
+	(%3APAL-NAME "amplitudNegativaOndaQ")
+	(%3APAL-RANGE "(defrange ?onda :FRAME OndaQ)")
+	(%3APAL-STATEMENT "(forall ?onda\n        (=> \n            (own-slot-not-null picoMaximo ?onda)\n            (< (picoMaximo ?onda) 0.0)\n        )\n)"))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20026] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "La amplitud de una OndaS es siempre negativa.")
+	(%3APAL-NAME "amplitudNegativaOndaS")
+	(%3APAL-RANGE "(defrange ?onda :FRAME OndaS)")
+	(%3APAL-STATEMENT "(forall ?onda\n        (=> \n            (own-slot-not-null picoMaximo ?onda)\n            (< (picoMaximo ?onda) 0.0)\n        )\n)"))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class20027] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "La amplitud de una OndaR es siempre positiva.")
+	(%3APAL-NAME "amplitudPositivaOndaR")
+	(%3APAL-RANGE "(defrange ?onda :FRAME OndaR)")
+	(%3APAL-STATEMENT "(forall ?onda\n        (=> \n            (own-slot-not-null picoMaximo ?onda)\n            (> (picoMaximo ?onda) 0.0)\n        )\n)"))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class4] of  Electrocardiograma
+
+	(frecuenciaCardiaca 0.0)
+	(numCiclos 1)
+	(tieneComplejosQRS [DSI_ONT_OPC_DSI%28nt%29_Class20018])
+	(tieneDiagnosticos [DSI_ONT_OPC_Nintendo+DSI%28nt%29_Class1])
+	(tieneIntervalos
+		[DSI_ONT_OPC_DSI%28nt%29_Class20013]
+		[DSI_ONT_OPC_DSI%28nt%29_Class20015])
+	(tieneOndas
+		[DSI_ONT_OPC_DSI%28nt%29_Class1]
+		[DSI_ONT_OPC_DSI%28nt%29_Class5]
+		[DSI_ONT_OPC_DSI%28nt%29_Class6]
+		[DSI_ONT_OPC_DSI%28nt%29_Class7]
+		[DSI_ONT_OPC_DSI%28nt%29_Class8])
+	(tieneSegmentos
+		[DSI_ONT_OPC_DSI%28nt%29_Class20016]
+		[DSI_ONT_OPC_DSI%28nt%29_Class20017]))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class5] of  OndaQ
+
+	(ciclo 1)
+	(picoMaximo -0.070103765)
+	(tFin 220)
+	(tInicio 190.0))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class6] of  OndaR
+
+	(ciclo 1)
+	(picoMaximo 3.0298963)
+	(tFin 250)
+	(tInicio 220.0))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class7] of  OndaS
+
+	(ciclo 1)
+	(picoMaximo -1.0298963)
+	(tFin 280)
+	(tInicio 250.0))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class8] of  OndaT
+
+	(ciclo 1)
+	(picoMaximo 0.37989622)
+	(tFin 590)
+	(tInicio 420.0))
+
+([DSI_ONT_OPC_DSI%28nt%29_Class9] of  %3APAL-CONSTRAINT
+
+	(%3APAL-DESCRIPTION "El tiempo de finalización de una onda ha de ser superior al tiempo de inicio.")
+	(%3APAL-NAME "tFinMayorQueTInicio")
+	(%3APAL-RANGE "(defrange ?onda :FRAME Onda)")
+	(%3APAL-STATEMENT "(forall ?onda\n        (=> (and (own-slot-not-null tInicio ?onda)\n                 (own-slot-not-null tFin ?onda))\n            (> (tFin ?onda) (tInicio ?onda))\n        )\n)"))
+
+([DSI_ONT_OPC_Nintendo+DSI%28nt%29_Class1] of  Diagnostico
+
+	(perteneceAECG [DSI_ONT_OPC_DSI%28nt%29_Class4])
+	(resultadoDiagnostico Taquicardia))
+
+([Onda] of  %3ASTANDARD-CLASS
+
+	(%3ASLOT-CONSTRAINTS [DSI_ONT_OPC_DSI%28nt%29_Class9]))
+
+([OndaQ] of  %3ASTANDARD-CLASS
+
+	(%3ASLOT-CONSTRAINTS [DSI_ONT_OPC_DSI%28nt%29_Class20025]))
+
+([OndaR] of  %3ASTANDARD-CLASS
+
+	(%3ASLOT-CONSTRAINTS [DSI_ONT_OPC_DSI%28nt%29_Class20027]))
+
+([OndaS] of  %3ASTANDARD-CLASS
+
+	(%3ASLOT-CONSTRAINTS [DSI_ONT_OPC_DSI%28nt%29_Class20026]))

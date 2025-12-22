@@ -1,0 +1,132 @@
+{-# OPTIONS_GHC -fno-warn-tabs #-}
+
+module Programa (EstadoJuego (..), main) where
+
+import ListasOcultas
+import Data.Char
+import System.IO
+
+type PalabraSecreta = ListaOculta Char
+
+instance Show PalabraSecreta where
+    show :: PalabraSecreta -> String
+    show p = concat[if elem e (l2 p) then show e ++ " " else "_ " | e <- (l1 p)]
+
+data EstadoJuego = JuegoEnCurso | Ganado | Perdido
+    deriving (Show, Eq)
+
+type Vidas = Int
+
+type Palabra = String
+
+type ConfiguracionJuego = (PalabraSecreta, Vidas, EstadoJuego)
+
+devuelveGrupo :: Char -> String
+devuelveGrupo c
+    | isLetter c == False = error "El dato introducido no es alfabetico"
+    | c == 'a' || c == 'A' = "aAáÁ"
+    | c == 'e' || c == 'E' = "eEéÉ"
+    | c == 'i' || c == 'I' = "iIíÍ"
+    | c == 'o' || c == 'o' = "oOóÓ"
+    | c == 'u' || c == 'U' = "uUúÚüÜ"
+    | otherwise = [toLower c, toUpper c]
+
+agregarLetra :: Char -> PalabraSecreta -> PalabraSecreta
+agregarLetra c p = L (l1 p) ((l2 p)  ++ (devuelveGrupo c)) 
+
+inicializarJuego :: Palabra -> Vidas -> ConfiguracionJuego
+inicializarJuego p v = ((L p []), v, JuegoEnCurso)
+
+calcularEstado :: PalabraSecreta -> Vidas -> EstadoJuego
+calcularEstado p v 
+    | v == 0 = Perdido
+    | otherwise = if visible p then Ganado else JuegoEnCurso
+
+actualizarVidas :: Char -> PalabraSecreta -> Vidas -> Vidas
+actualizarVidas c p v = if any (== True )[elem x (l1 p) | x <- (devuelveGrupo c)] then v else v-1
+
+pasoJuego :: Char -> ConfiguracionJuego -> ConfiguracionJuego
+pasoJuego c (p, v, e) = (nuevaPal, nuevaVid, calcularEstado nuevaPal nuevaVid) 
+                        where nuevaPal = agregarLetra c p
+                              nuevaVid = actualizarVidas c nuevaPal v
+
+bucle :: ConfiguracionJuego -> IO()
+bucle (p, v, e) = do 
+                    putStr "Progreso: " 
+                    print p
+                    putStr "Vidas: " 
+                    print v
+                    putStr "Introduce una letra: "
+                    a <- readLn
+                    let x = a :: Char
+                    let pj = pasoJuego x (p, v, e)
+                    if estadoGanado pj == True 
+                        then
+                            do
+                                putStr "Progreso: " 
+                                print (devuelveProgreso pj)
+                                putStr "Vidas: " 
+                                print (devuelveVidas pj)
+                                putStr "¡Has Ganado!"
+                    else
+                        do
+                            bucle pj
+
+
+devuelveVidas :: ConfiguracionJuego -> Vidas
+devuelveVidas (p, v, e) = v       
+
+devuelveProgreso :: ConfiguracionJuego -> PalabraSecreta
+devuelveProgreso (p, v, e) = p
+
+estadoGanado :: ConfiguracionJuego -> Bool
+estadoGanado (p, v, e) = if e == Ganado then True else False
+
+main :: IO()
+main = do
+        hSetEcho stdin True
+        putStrLn "Introduce los errores permitidos: "
+        e <- readLn
+        let vidas = e :: Vidas
+        putStrLn "Introduce la palabra secreta: "
+        hSetEcho stdin False
+        p <- readLn
+        let palsec = p :: Palabra
+        hSetEcho stdin True
+        putStrLn ""
+        putStrLn "¡Comienza el juego!"
+        bucle (inicializarJuego palsec vidas)
+        --EXTRA
+        writeFile "palabras.txt" palsec
+        putStrLn "¿Quieres saber cuales son las palabras y las letras mas usadas en el juego? (S/N)"
+        res <- readLn 
+        if res == 'S' || res == 's'
+            then
+                do
+                    putStrLn "Porcentajes de palabras: "
+                    cad <- readFile "palabras.txt"
+                    let palabras = words cad :: [Palabra] 
+                    let cant = getCant palabras :: [(Palabra, Int)]
+                    let porcentaje = getPorcentaje cant palabras
+                    print (imprimePorcentaje porcentaje)
+                    
+        else
+            do
+                putStr ""
+
+listaSinRepetir :: [Palabra] -> [Palabra]
+listaSinRepetir p = [y |(x,y) <- zip [0..] p, elem y (take x p) == False]
+
+getCant :: [Palabra] -> [(Palabra, Int)]
+getCant p = [(e,contar[if x == e then 1 else 0 | x <- p]) |e <- (listaSinRepetir p)]
+
+contar :: [Int] -> Int
+contar l
+    | null l = 0
+    | otherwise = if head l == 1 then 1 + contar(tail l) else 0 + contar(tail l)
+
+getPorcentaje :: [(Palabra, Int)] -> [Palabra] -> [(Palabra, Int)]
+getPorcentaje [(p, n)] pal = [(x, (y `div` (length pal))*100) | (x,y) <- [(p, n)]]
+
+imprimePorcentaje :: [(Palabra, Int)] -> String
+imprimePorcentaje [(p, n)] = concat[p ++ "se ha usado el " ++ show n ++ " % de las veces" ++ "\n" |x <- [(p, n)]]

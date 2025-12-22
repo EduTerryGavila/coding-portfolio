@@ -1,0 +1,149 @@
+//created on: 25 oct 2025
+package rules
+
+agenda-group "diagnostico"
+
+import dsi.*;
+import dsi.Diagnostico.TipoDiagnostico;
+
+global InfoSalida salida;
+
+// ------------------------------------------------------------------------------------------------
+// TAQUICARDIA
+// ------------------------------------------------------------------------------------------------
+rule "Taquicardia"
+when
+    exists(HeartRate(valor > 100)) // Basta con que exista, no accedemos al hecho en el consecuente
+    not(Diagnostico(tipo == TipoDiagnostico.TAQUICARDIA))
+then
+    Diagnostico d = new Diagnostico(
+    	TipoDiagnostico.TAQUICARDIA, 
+        "frecuencia cardíaca superior a 100 pul/min"
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// BRADICARDIA
+// ------------------------------------------------------------------------------------------------
+rule "Bradicardia"
+when
+    exists(HeartRate(valor < 60)) // Basta con que exista, no accedemos al hecho en el consecuente
+    not(Diagnostico(tipo == TipoDiagnostico.BRADICARDIA))
+then
+    Diagnostico d = new Diagnostico(
+    	TipoDiagnostico.BRADICARDIA, 
+        "frecuencia cardíaca inferior a 60 pul/min"
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// HIPOCALCEMIA
+// ------------------------------------------------------------------------------------------------
+rule "Hipocalcemia"
+when
+	 $i: IntervaloQT( $duracion : getDuracion(), $duracion >= 440 )
+	 not(Diagnostico(tipo == TipoDiagnostico.HIPOCALCEMIA))
+then
+	Diagnostico d = new Diagnostico(
+		TipoDiagnostico.HIPOCALCEMIA, 
+        "intervalo QT de duración superior a 440 ms (" + $duracion + " ms) en el ciclo " + $i.getCiclo()
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// INFARTO AGUDO DE MIOCARDIO
+// ------------------------------------------------------------------------------------------------
+rule "InfartoAgudoMiocardio"
+when
+    $o : OndaT(picoMaximo > 10)
+    $st : SegmentoST(getDuracion() > 80 )
+    not(Diagnostico(tipo == TipoDiagnostico.INFARTO_AGUDO_MIOCARDIO))
+then
+    Diagnostico d = new Diagnostico(TipoDiagnostico.INFARTO_AGUDO_MIOCARDIO, 
+                                    "ST prolongado (" + $st.getDuracion() + " ms) en el ciclo " + $o.getCiclo());
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// HIPOPOTASEMIA
+// ------------------------------------------------------------------------------------------------
+rule "Hipopotasemia"
+when
+	$o : OndaT(picoMaximo < -14f) // Umbral obtenido mirando ficheros
+	not(Diagnostico(tipo == TipoDiagnostico.HIPOPOTASEMIA))
+then
+	Diagnostico d = new Diagnostico(
+		TipoDiagnostico.HIPOPOTASEMIA, 
+        "onda T con amplitud inferior a -14 mV (" + $o.getPicoMaximo() + " mV) en el ciclo " + $o.getCiclo()
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// ISQUEMIA CORONARIA
+// ------------------------------------------------------------------------------------------------
+rule "IsquemiaCoronaria"
+when
+	$o : OndaT(picoMaximo < -9f, picoMaximo >= -14f) // Umbral obtenido mirando ficheros
+	not(Diagnostico(tipo == TipoDiagnostico.ISQUEMIA_CORONARIA))
+then
+	Diagnostico d = new Diagnostico(
+		TipoDiagnostico.ISQUEMIA_CORONARIA, 
+        "onda T con amplitud inferior a -9 mV (" + $o.getPicoMaximo() + " mV) en el ciclo " + $o.getCiclo()
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " +d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// CONTRACCIÓN VENTRICULAR PREMATURA
+// ------------------------------------------------------------------------------------------------
+rule "ContraccionVentricularPrematura"
+when
+	$c : ComplejoQRS()
+	eval($c.getDuracion() <= 75) // Obtenido mirando ficheros
+	not(Diagnostico(tipo == TipoDiagnostico.CONTRACCION_VENTRICULAR_PREMATURA))
+then
+	Diagnostico d = new Diagnostico(
+		TipoDiagnostico.CONTRACCION_VENTRICULAR_PREMATURA, 
+        "duración del complejoQRS inferior a 75 ms (" + $c.getDuracion() + " ms) en el ciclo " + $c.getCiclo()
+    );
+    insert(d);
+    salida.escribir("ECG_Pattern: " + d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// SANO
+// ------------------------------------------------------------------------------------------------
+rule "Sano"
+	salience -1 // Para que se ejecute la última
+when
+	not(Diagnostico())
+then
+	Diagnostico d = new Diagnostico(
+		TipoDiagnostico.SANO
+	);
+	insert(d);
+	salida.escribir("ECG_Pattern: " + d.toString());
+end
+
+// ------------------------------------------------------------------------------------------------
+// Insertar salto de línea después de procesar todos los diagnosticos para que quede separado el 
+// fichero global
+// ------------------------------------------------------------------------------------------------
+rule "InsertarSaltoLineaSigFichero"
+	salience -100
+when
+then
+	salida.escribir("\n");
+end
+
+

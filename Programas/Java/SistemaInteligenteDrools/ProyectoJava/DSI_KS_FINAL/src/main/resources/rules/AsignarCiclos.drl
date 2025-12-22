@@ -1,0 +1,113 @@
+package rules
+
+agenda-group "asignar-ciclos"
+
+import dsi.*;
+
+global InfoSalida salida;
+
+// ------------------------------------------------------------------------------------------------
+// INSERTAR PRIMER CICLO
+// ------------------------------------------------------------------------------------------------
+rule "InsertarPrimerCiclo"
+	salience 100
+when
+	not (Ciclo())
+then
+	insert(new Ciclo(0));
+end
+
+// ------------------------------------------------------------------------------------------------
+// ONDA P
+// ------------------------------------------------------------------------------------------------
+rule "ProcesarOndaP"
+	salience 10
+when
+    $c : Ciclo()
+    $p : OndaP(procesada == false )
+then
+    int cicloActual = $c.getCiclo();
+
+    modify($p) {
+        setCiclo(cicloActual + 1),
+        setProcesada(true)
+    };
+    
+    modify($c) { setCiclo(cicloActual + 1) };
+end
+
+// ------------------------------------------------------------------------------------------------
+// ONDA Q
+// ------------------------------------------------------------------------------------------------
+rule "ProcesarOndaQ"
+	salience 9
+when
+    $q : OndaQ(procesada == false)
+    $p : OndaP(procesada == true, tInicio < $q.tInicio)
+    not( OndaP(procesada == true, tInicio < $q.tInicio, tInicio > $p.tInicio ) )
+then
+    modify($q) {
+        setCiclo($p.getCiclo()),
+        setProcesada(true)
+    };
+end
+
+// ------------------------------------------------------------------------------------------------
+// ONDA R
+// ------------------------------------------------------------------------------------------------
+rule "ProcesarOndaR"
+	salience 8
+when
+	$r : OndaR(procesada == false)
+	$q : OndaQ(procesada == true, tInicio < $r.tInicio)
+	not( OndaQ(procesada == true, tInicio < $r.tInicio, tInicio > $q.tInicio ) )
+then
+    modify($r) {
+        setCiclo($q.getCiclo()),
+        setProcesada(true)
+    };
+end
+
+// ------------------------------------------------------------------------------------------------
+// ONDA S
+// ------------------------------------------------------------------------------------------------
+rule "ProcesarOndaS"
+	salience 7
+when
+	$s : OndaS(procesada == false)
+	$r : OndaR(procesada == true, tInicio < $s.tInicio)
+	not( OndaR(procesada == true, tInicio < $s.tInicio, tInicio > $r.tInicio) )
+then
+    modify($s) {
+        setCiclo($r.getCiclo()),
+        setProcesada(true)
+    };
+end
+
+// ------------------------------------------------------------------------------------------------
+// ONDA T
+// ------------------------------------------------------------------------------------------------
+rule "ProcesarOndaT"
+	salience 6
+when
+	$t : OndaT(procesada == false)
+	$s : OndaS(procesada == true, tInicio < $t.tInicio)
+	not( OndaS(procesada == true, tInicio < $t.tInicio, tInicio > $s.tInicio) )
+then
+    modify($t) {
+        setCiclo($s.getCiclo()),
+        setProcesada(true)
+    };
+end
+
+// ------------------------------------------------------------------------------------------------
+// ESCRIBIR CICLOS A LOS FICHEROS
+// ------------------------------------------------------------------------------------------------
+rule "EscribirCiclosFichero"
+	salience -1
+when
+	$c: Ciclo()
+then
+	salida.escribir("Número de ciclos: " + $c.getCiclo());
+end
+	

@@ -1,0 +1,419 @@
+; Wed Nov 19 18:30:28 CET 2025
+; 
+;+ (version "3.4.8")
+;+ (build "Build 629")
+
+
+(defclass %3ACLIPS_TOP_LEVEL_SLOT_CLASS "Fake class to save top-level slot information"
+	(is-a USER)
+	(role abstract)
+	(single-slot tInicio
+;+		(comment "Momento en el que inicia la onda.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot empiezaConComplejoQRS
+;+		(comment "Cada IntervaloQT comienza con un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneSegmentos
+;+		(comment "Un electrocardiograma tiene varios segmentos.")
+		(type INSTANCE)
+;+		(allowed-classes Segmento)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(single-slot empiezaDespuesDeOndaP
+;+		(comment "Un SegmentoPR comienza cuando acaba una OndaP")
+		(type INSTANCE)
+;+		(allowed-classes OndaP)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot ciclo
+;+		(comment "Representa al ciclo al que pertenece la onda")
+		(type INTEGER)
+		(range 1 %3FVARIABLE)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot resultadoDiagnostico
+;+		(comment "Representa la enfermedad que tiene el paciente o \"Sano\" si no padece ninguna.")
+		(type SYMBOL)
+		(allowed-values Hipopotasemia Hipocalcemia InfartoAgudoDeMiocardioTemprano IsquemiaCoronaria Bradicardia Taquicardia AleteoAuricular ContraccionPrematuraVentricular Sano)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaAntesDeOndaT
+;+		(comment "Un IntervaloST acaba antes de que comience una OndaT.")
+		(type INSTANCE)
+;+		(allowed-classes OndaT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot tFin
+;+		(comment "Momento en el que finaliza una onda.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot perteneceAElectrocardiograma
+;+		(comment "Un ciclo cardiaco pertenece a un electrocardiograma.")
+		(type INSTANCE)
+;+		(allowed-classes Electrocardiograma)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot continuaConSegmentoST
+;+		(comment "Después del ComplejoQRS acontece un SegmentoST.")
+		(type INSTANCE)
+;+		(allowed-classes SegmentoST)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot picoMaximo
+;+		(comment "Punto mas alto de una onda.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot continuaConOndaR
+;+		(comment "Después de una OndaQ tiene lugar una OndaR.")
+		(type INSTANCE)
+;+		(allowed-classes OndaR)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot numCiclo
+;+		(comment "Representa el numero de ciclos de un ciclo cardiaco.")
+		(type INTEGER)
+		(range 1 %3FVARIABLE)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot frecuenciaCardiaca
+;+		(comment "Es necesario calcularla para llegar a conclusiones relevantes relacionadas con el proyecto.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaConOndaT
+;+		(comment "Después de un IntervaloST, tiene lugar una OndaT, que da fin al IntervaloQT.")
+		(type INSTANCE)
+;+		(allowed-classes OndaT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot tieneIntervaloPR
+;+		(comment "Un ciclo cardiaco tiene un intervalo PR.")
+		(type INSTANCE)
+;+		(allowed-classes IntervaloPR)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneIntervalos
+;+		(comment "Un electrocardiograma tiene varios intervalos.")
+		(type INSTANCE)
+;+		(allowed-classes Intervalo)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(single-slot comienzaConOndaP
+;+		(comment "Cada IntervaloPR comienza cuando lo hace una OndaP.")
+		(type INSTANCE)
+;+		(allowed-classes OndaP)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaConOndaS
+;+		(comment "Después de una OndaR tiene lugar una OndaS, que da fin al ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes OndaS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaAntesDeComplejoQRS
+;+		(comment "Un SegmentoPR acaba cuando comienza un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneDiagnosticos
+;+		(comment "Un electrocardiograma tiene uno o más diagnósticos.")
+		(type INSTANCE)
+;+		(allowed-classes Diagnostico)
+		(cardinality 1 ?VARIABLE)
+;+		(inverse-slot perteneceAECG)
+		(create-accessor read-write))
+	(single-slot duracion
+;+		(comment "Duracion del complejo.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot tieneOndaP
+;+		(comment "Un ciclo cardiaco tiene una onda P.")
+		(type INSTANCE)
+;+		(allowed-classes OndaP)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot tieneIntervaloQT
+;+		(comment "Cada ciclo cardíaco tiene un intervalo QT.")
+		(type INSTANCE)
+;+		(allowed-classes IntervaloQT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneComplejosQRS
+;+		(comment "Un electrocardiograma tiene varios complejos QRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(single-slot duracionInter
+;+		(comment "Tiempo que dura un intervalo.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot comienzaDespuesDeComplejoQRS
+;+		(comment "Un SegmentoST comienza cuando acaba un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot numCiclos
+;+		(comment "Necesario para calcular la frecuencia cardiaca.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot acabaConSegmentoPR
+;+		(comment "Cada IntervaloPR acaba con un SegmentoPR.")
+		(type INSTANCE)
+;+		(allowed-classes SegmentoPR)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot perteneceAECG
+;+		(comment "Los diagnosticos tienen electrocardiogramas.")
+		(type INSTANCE)
+;+		(allowed-classes Electrocardiograma)
+;+		(inverse-slot tieneDiagnosticos)
+		(create-accessor read-write))
+	(single-slot duracionSegm
+;+		(comment "Duracion de un segmento.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot empiezaConOndaQ
+;+		(comment "Cada ComplejoQRS comienza con una OndaQ.")
+		(type INSTANCE)
+;+		(allowed-classes OndaQ)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneOndas
+;+		(comment "Un electrocardiograma tiene varias ondas.")
+		(type INSTANCE)
+;+		(allowed-classes Onda)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write)))
+
+(defclass Electrocardiograma "Representa la información relativa al electrocardiograma realizado al paciente."
+	(is-a USER)
+	(role concrete)
+	(single-slot numCiclos
+;+		(comment "Necesario para calcular la frecuencia cardiaca.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot frecuenciaCardiaca
+;+		(comment "Es necesario calcularla para llegar a conclusiones relevantes relacionadas con el proyecto.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot tieneDiagnosticos
+;+		(comment "Un electrocardiograma tiene uno o más diagnósticos.")
+		(type INSTANCE)
+;+		(allowed-classes Diagnostico)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(multislot tieneSegmentos
+;+		(comment "Un electrocardiograma tiene varios segmentos.")
+		(type INSTANCE)
+;+		(allowed-classes Segmento)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(multislot tieneOndas
+;+		(comment "Un electrocardiograma tiene varias ondas.")
+		(type INSTANCE)
+;+		(allowed-classes Onda)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(multislot tieneIntervalos
+;+		(comment "Un electrocardiograma tiene varios intervalos.")
+		(type INSTANCE)
+;+		(allowed-classes Intervalo)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write))
+	(multislot tieneComplejosQRS
+;+		(comment "Un electrocardiograma tiene varios complejos QRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+		(cardinality 1 ?VARIABLE)
+		(create-accessor read-write)))
+
+(defclass Onda "Representa cada una de las ondas extraidas del electrocardiograma."
+	(is-a USER)
+	(role abstract)
+	(single-slot tInicio
+;+		(comment "Momento en el que inicia la onda.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot tFin
+;+		(comment "Momento en el que finaliza una onda.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot picoMaximo
+;+		(comment "Punto mas alto de una onda.")
+		(type FLOAT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot ciclo
+;+		(comment "Representa al ciclo al que pertenece la onda")
+		(type INTEGER)
+		(range 1 %3FVARIABLE)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass OndaP "Representa la onda P."
+	(is-a Onda)
+	(role concrete))
+
+(defclass OndaQ "Representa la onda Q."
+	(is-a Onda)
+	(role concrete))
+
+(defclass OndaR "Representa la onda R."
+	(is-a Onda)
+	(role concrete))
+
+(defclass OndaS "Representa la onda S."
+	(is-a Onda)
+	(role concrete))
+
+(defclass OndaT "Representa la onda T."
+	(is-a Onda)
+	(role concrete))
+
+(defclass Intervalo "Representa un intervalo que comienza con una onda y termina con otra."
+	(is-a USER)
+	(role abstract)
+	(single-slot duracionInter
+;+		(comment "Tiempo que dura un intervalo.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass IntervaloPR "Es el fragmento desde que empieza la onda P hasta que empieza la onda Q. Está formado por una OndaP y un SegmentoPR."
+	(is-a Intervalo)
+	(role concrete)
+	(single-slot comienzaConOndaP
+;+		(comment "Cada IntervaloPR comienza cuando lo hace una OndaP.")
+		(type INSTANCE)
+;+		(allowed-classes OndaP)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot acabaConSegmentoPR
+;+		(comment "Cada IntervaloPR acaba con un SegmentoPR.")
+		(type INSTANCE)
+;+		(allowed-classes SegmentoPR)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass IntervaloQT "Es el fragmento desde que empieza la onda Q hasta que termina la onda T. Está formado por un ComplejoQRS, un SegmentoST y una OndaT."
+	(is-a Intervalo)
+	(role concrete)
+	(single-slot empiezaConComplejoQRS
+;+		(comment "Cada IntervaloQT comienza con un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot continuaConSegmentoST
+;+		(comment "Después del ComplejoQRS acontece un SegmentoST.")
+		(type INSTANCE)
+;+		(allowed-classes SegmentoST)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaConOndaT
+;+		(comment "Después de un IntervaloST, tiene lugar una OndaT, que da fin al IntervaloQT.")
+		(type INSTANCE)
+;+		(allowed-classes OndaT)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass Segmento "Transcurso de tiempo entre dos ondas."
+	(is-a USER)
+	(role abstract)
+	(single-slot duracionSegm
+;+		(comment "Duracion de un segmento.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass SegmentoPR "Es el fragmento que conecta la onda P y la onda Q."
+	(is-a Segmento)
+	(role concrete)
+	(single-slot terminaAntesDeComplejoQRS
+;+		(comment "Un SegmentoPR acaba cuando comienza un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot empiezaDespuesDeOndaP
+;+		(comment "Un SegmentoPR comienza cuando acaba una OndaP")
+		(type INSTANCE)
+;+		(allowed-classes OndaP)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass SegmentoST "Es el fragmento que conecta la onda S y la onda T."
+	(is-a Segmento)
+	(role concrete)
+	(single-slot terminaAntesDeOndaT
+;+		(comment "Un IntervaloST acaba antes de que comience una OndaT.")
+		(type INSTANCE)
+;+		(allowed-classes OndaT)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot comienzaDespuesDeComplejoQRS
+;+		(comment "Un SegmentoST comienza cuando acaba un ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes ComplejoQRS)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass ComplejoQRS "Intervalo de tiempo formado por una onda Q, R y S en ese orden."
+	(is-a USER)
+	(role concrete)
+	(single-slot duracion
+;+		(comment "Duracion del complejo.")
+		(type INTEGER)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot empiezaConOndaQ
+;+		(comment "Cada ComplejoQRS comienza con una OndaQ.")
+		(type INSTANCE)
+;+		(allowed-classes OndaQ)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot terminaConOndaS
+;+		(comment "Después de una OndaR tiene lugar una OndaS, que da fin al ComplejoQRS.")
+		(type INSTANCE)
+;+		(allowed-classes OndaS)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(single-slot continuaConOndaR
+;+		(comment "Después de una OndaQ tiene lugar una OndaR.")
+		(type INSTANCE)
+;+		(allowed-classes OndaR)
+;+		(cardinality 1 1)
+		(create-accessor read-write)))
+
+(defclass Diagnostico
+	(is-a USER)
+	(role concrete)
+	(single-slot resultadoDiagnostico
+;+		(comment "Representa la enfermedad que tiene el paciente o \"Sano\" si no padece ninguna.")
+		(type SYMBOL)
+		(allowed-values Hipopotasemia Hipocalcemia InfartoAgudoDeMiocardioTemprano IsquemiaCoronaria Bradicardia Taquicardia AleteoAuricular ContraccionPrematuraVentricular Sano)
+;+		(cardinality 1 1)
+		(create-accessor read-write))
+	(multislot perteneceAECG
+;+		(comment "Los diagnosticos tienen electrocardiogramas.")
+		(type INSTANCE)
+;+		(allowed-classes Electrocardiograma)
+		(create-accessor read-write)))

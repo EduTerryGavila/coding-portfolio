@@ -1,0 +1,102 @@
+//created on: 25 oct 2025
+package rules
+
+agenda-group "electrocardiograma"
+
+import dsi.*;
+
+global InfoSalida salida;
+
+// ------------------------------------------------------------------------------------------------
+// INTERVALO_PR
+// ------------------------------------------------------------------------------------------------
+rule "CrearIntervaloPR"
+salience 10
+    when
+        $p: OndaP()
+        $q: OndaQ(ciclo == $p.ciclo)
+        not(IntervaloPR(ondaInicio == $p, ondaFin == $q))
+    then
+        insert(new IntervaloPR($p, $q));
+end
+
+// ------------------------------------------------------------------------------------------------
+// INTERVALO_QT
+// ------------------------------------------------------------------------------------------------
+rule "CrearIntervaloQT"
+salience 10
+    when
+        $q: OndaQ()
+        $t: OndaT(ciclo == $q.ciclo)
+        not(IntervaloQT(ondaInicio == $q, ondaFin == $t))
+    then
+        insert(new IntervaloQT($q, $t));
+end
+
+// ------------------------------------------------------------------------------------------------
+// SEGMENTO_PR
+// ------------------------------------------------------------------------------------------------
+rule "CrearSegmentoPR"
+salience 10
+    when
+        $p: OndaP()
+        $q: OndaQ(ciclo == $p.ciclo)
+        not(SegmentoPR(ondaInicio == $p, ondaFin == $q))
+    then
+        insert(new SegmentoPR($p, $q));
+end
+
+// ------------------------------------------------------------------------------------------------
+// SEGMENTO_ST
+// ------------------------------------------------------------------------------------------------
+rule "CrearSegmentoST"
+salience 10
+    when
+        $s: OndaS()
+        $t: OndaT(ciclo == $s.ciclo)
+        not(SegmentoST(ondaInicio == $s, ondaFin == $t))
+    then
+        insert(new SegmentoST($s, $t));
+end
+
+// ------------------------------------------------------------------------------------------------
+// COMPLEJO_QRS
+// ------------------------------------------------------------------------------------------------
+rule "CrearComplejoQRS"
+salience 10
+    when
+        $q: OndaQ()
+        $s: OndaS(ciclo == $q.ciclo)
+        not(ComplejoQRS(ondaQ == $q, ondaS == $s))
+    then
+        insert(new ComplejoQRS($q, (OndaR)null, $s));
+end
+
+// ------------------------------------------------------------------------------------------------
+// HEARTRATE
+// ------------------------------------------------------------------------------------------------
+// Decidimos calcular el heartRate con los intervalos RR porque no conseguíamos los
+// resultados esperados con la definición del enunciado de la práctica (diferencia bloques Q-T).
+rule "CalcularHeartRateRR"
+	salience 10
+when
+    $primer: OndaR()
+    not (OndaR(tInicio < $primer.tInicio))
+
+    $ultimo: OndaR()
+    not (OndaR(tInicio > $ultimo.tInicio))
+    
+    not (HeartRate())
+then
+    int numCiclos = $ultimo.getCiclo();
+    int duracionMs = $ultimo.gettInicio() - $primer.gettInicio();
+
+    int hr = 60000 * numCiclos / duracionMs;
+    HeartRate heartRate = new HeartRate(hr);
+    insert(heartRate);
+    
+    salida.escribir("HeartRate: " + heartRate.getValor() + " pul/min");
+end
+
+
+

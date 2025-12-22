@@ -1,0 +1,17 @@
+{-# OPTIONS_GHC -fno-warn-tabs #-}
+
+module ListasOcultas where
+
+data ListaOculta a = L {l1::[a], l2::[a]}
+
+creaListaOculta :: [a] -> ListaOculta a 
+creaListaOculta l = L l []
+
+devuelveListaReal :: ListaOculta a -> [a]
+devuelveListaReal l = l1 l
+
+visible :: Eq a => ListaOculta a -> Bool
+visible l = all (== True) [ elem x (l2 l) == True | x <- (l1 l)]
+
+contieneElemento :: Eq a => ListaOculta a -> a -> Bool
+contieneElemento l e = elem e (l1 l)

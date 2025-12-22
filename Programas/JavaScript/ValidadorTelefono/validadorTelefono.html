@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Validador de Teléfono</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1 class="title">Validador de Número de Teléfono (EE. UU.)</h1>
+
+    <div class="form-group">
+      <label for="user-input" class="label">Número de teléfono:</label>
+      <input
+        type="text"
+        id="user-input"
+        class="input"
+        placeholder="e.g. 1 555-555-5555"
+        autocomplete="tel"
+      />
+    </div>
+
+    <div class="button-group">
+      <button id="check-btn" class="btn btn–primary">Comprobar</button>
+      <button id="clear-btn" class="btn btn–secondary">Limpiar</button>
+    </div>
+
+    <div id="results-div" class="results"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
