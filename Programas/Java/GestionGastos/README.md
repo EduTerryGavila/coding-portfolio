@@ -1,15 +1,5 @@
 # App Gastos
 
-## Integrantes del grupo:
-
-    - Eduardo Terry Gavilá  | eduardo.terryg@um.es | Grupo 3.4
-    - Gonzalo Lucena Vázquez | gonzalo.lucenav@um.es | Grupo 3.1
-    - Pedro José Aguilar Garre | pj.aguilargarre@um.es | Grupo 3.4
-
-## Profesor responsable:
-
-    - Pedro Delgado Yarza
-
 ## Historias de usuario y modelado:
 
 - [Ver modelado](docs/ModeladoUML.jpeg)
