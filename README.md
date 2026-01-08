@@ -9,7 +9,7 @@ Bienvenido a mi portafolio de proyectos de Ingeniería Informática. Aquí encon
 - [App de gestion de gastos](Programas/Java/GestionGastos/): Aplicación para la gestión de gastos individuales o cuentas compartidas.
 - [Sistema basado en reglas con factores de certeza](Programas/C++/SBR-FC-SSII/): Motor de inferencia con reglas y factores de certeza.
 - [Proyecto NanoFiles](Programas/Java/ProyectoNanoFilesRedes/): Simulación de red para transferencia de archivos.
-- [Divide y vencerás](Programas/C++/AEDII-DyV/): Implementación de un algortimo usando la técnica DyV.
+- [Backtracking y Algoritmo voraz](Programas/C++/AEDII-BackTracking-y-AlgoritmoRapido/): Implementación de dos algortimos usando dos técnicas.
 - [Prediccion base de datos ML](Programas/R/MachineLearning/): Evaluacion de distintos modelos ML usando la librería Caret en R.
 - [Algoritmo genético de n-reinas](Programas/C++/AlgoritmoGeneticoNreinas/): Solución aproximada al problema de las n-reinas usando un algoritmo genetico con la libreria galib en C++.
 - [Compilador MiniC](Programas/C/CompiladorMiniC/): Compilador de una versión simplificada de C.
