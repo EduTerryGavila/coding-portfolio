@@ -6,6 +6,7 @@ Bienvenido a mi portafolio de proyectos de Ingeniería Informática. Aquí encon
 
 ## 🚀 Proyectos más relevantes
 
+- [App de gestion de gastos](Programas/Java/GestionGastos/): Aplicación para la gestión de gastos individuales o cuentas compartidas.
 - [Sistema basado en reglas con factores de certeza](Programas/C++/SBR-FC-SSII/): Motor de inferencia con reglas y factores de certeza.
 - [Proyecto NanoFiles](Programas/Java/ProyectoNanoFilesRedes/): Simulación de red para transferencia de archivos.
 - [Divide y vencerás](Programas/C++/AEDII-DyV/): Implementación de un algortimo usando la técnica DyV.
