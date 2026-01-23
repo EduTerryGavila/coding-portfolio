@@ -1,6 +1,7 @@
 #include <iostream>
 
 using namespace std;
+
 const int n = 3;
 const int m = 12;
 typedef int Matriz[n][m];
