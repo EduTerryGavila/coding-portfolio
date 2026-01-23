@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.miapp.flashcards.vista.ControladorEstadisticas">
+   <children>
+      <Label fx:id="lblTituloPrincipal" text="Estadísticas" textFill="#009688">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      
+      <Label text="Resumen de tu actividad en la plataforma" textFill="#666666" />
+
+      <GridPane hgap="20.0" vgap="20.0" alignment="CENTER">
+         <children>
+            
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #E3F2FD; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="0" GridPane.rowIndex="0">
+               <children>
+                  <Label fx:id="lblDato1" text="0" textFill="#1565C0">
+                     <font>
+                        <Font name="System Bold" size="48.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTitulo1" text="Dato 1" textFill="#555555">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #E8F5E9; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="1" GridPane.rowIndex="0">
+               <children>
+                  <Label fx:id="lblDato2" text="0" textFill="#2E7D32">
+                     <font>
+                        <Font name="System Bold" size="48.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTitulo2" text="Dato 2" textFill="#555555">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            
+            <VBox fx:id="cardPromedio" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #FFF3E0; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="0" GridPane.rowIndex="1">
+               <children>
+                  <Label fx:id="lblDato3" text="0" textFill="#EF6C00">
+                     <font>
+                        <Font name="System Bold" size="36.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTitulo3" text="Dato 3" textFill="#555555">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            
+            <VBox fx:id="cardRacha" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #FFEBEE; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Label fx:id="lblDato4" text="0" textFill="#C62828">
+                     <font>
+                        <Font name="System Bold" size="36.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblTitulo4" text="Dato 4" textFill="#555555">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #F3E5F5; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="0" GridPane.rowIndex="2">
+               <children>
+                  <Label fx:id="lblTiempoTotal" text="0h" textFill="#8E24AA">
+                     <font>
+                        <Font name="System Bold" size="28.0" />
+                     </font>
+                  </Label>
+                  <Label text="Tiempo Total en App" textFill="#555555" />
+               </children>
+            </VBox>
+
+            <VBox alignment="CENTER" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: #E0F7FA; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Label fx:id="lblFechaRegistro" text="-" textFill="#0097A7">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+                  <Label text="Miembro Desde" textFill="#555555" />
+               </children>
+            </VBox>
+
+         </children>
+      </GridPane>
+      
+   </children>
+   <padding>
+      <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+   </padding>
+</VBox>

@@ -1,0 +1,56 @@
+[ "java.util.ArrayList", [ {
+  "@class" : "com.miapp.flashcards.modelo.Estudiante",
+  "id" : 1,
+  "nombre" : "Javier Martinez",
+  "email" : "javi@gmail.com",
+  "password" : "1234",
+  "fechaRegistro" : "2026-01-12",
+  "tiempoUsoSegundos" : 7,
+  "cursosCursados" : 0,
+  "preguntasRespondidas" : 0,
+  "preguntasCorrectas" : 0,
+  "estrategiaFavorita" : null,
+  "rachaActual" : 1,
+  "mejorRacha" : 1,
+  "fechaUltimaActividad" : "2026-01-12",
+  "cursosSuscritosIds" : [ "java.util.HashSet", [ ] ],
+  "progresosGuardados" : {
+    "@class" : "java.util.HashMap"
+  }
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Creador",
+  "id" : 2,
+  "nombre" : "Profesor Mates",
+  "email" : "mates@gmail.com",
+  "password" : "mates",
+  "fechaRegistro" : "2026-01-12",
+  "tiempoUsoSegundos" : 232,
+  "cursosCreados" : 0
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Creador",
+  "id" : 3,
+  "nombre" : "Profe de fisica",
+  "email" : "fisica@gmail.com",
+  "password" : "fisica",
+  "fechaRegistro" : "2026-01-12",
+  "tiempoUsoSegundos" : 268,
+  "cursosCreados" : 0
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Creador",
+  "id" : 4,
+  "nombre" : "Trainer",
+  "email" : "pokemon@gmail.com",
+  "password" : "poke",
+  "fechaRegistro" : "2026-01-12",
+  "tiempoUsoSegundos" : 241,
+  "cursosCreados" : 0
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Creador",
+  "id" : 5,
+  "nombre" : "Steve",
+  "email" : "minecraft@gmail.com",
+  "password" : "mine",
+  "fechaRegistro" : "2026-01-12",
+  "tiempoUsoSegundos" : 193,
+  "cursosCreados" : 0
+} ] ]

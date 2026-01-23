@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="700.0" spacing="20.0" style="-fx-background-color: #F5F5F5;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.miapp.flashcards.vista.ControladorCursar">
+   <children>
+      
+      <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #009688; -fx-padding: 15;">
+         <children>
+            <Label fx:id="lblNombreCurso" text="Nombre del Curso" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+            <Label fx:id="lblProgreso" text="Pregunta 1 de 10" textFill="#e0f2f1" HBox.hgrow="ALWAYS" maxWidth="Infinity" alignment="CENTER_RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+
+      <VBox alignment="CENTER" maxWidth="600.0" prefHeight="300.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);" VBox.vgrow="ALWAYS">
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+         <children>
+            
+            <Label fx:id="lblEnunciado" text="¿Aquí irá la pregunta?" textAlignment="CENTER" wrapText="true" textFill="#333333">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Label>
+
+            <StackPane VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox fx:id="panelVoF" alignment="CENTER" spacing="15.0" visible="false">
+                     <children>
+                        <RadioButton fx:id="rbVerdadero" text="Verdadero" style="-fx-font-size: 16px;">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="grupoVoF" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="rbFalso" text="Falso" toggleGroup="$grupoVoF" style="-fx-font-size: 16px;" />
+                        <RadioButton fx:id="rbNoSe" text="No lo sé / Saltar" toggleGroup="$grupoVoF" style="-fx-font-size: 16px; -fx-text-fill: #777;" />
+                     </children>
+                  </VBox>
+
+                  <VBox fx:id="panelTexto" alignment="CENTER" spacing="10.0" visible="false">
+                     <children>
+                        <Label text="Escribe tu respuesta:" textFill="#666666" />
+                        <TextArea fx:id="txtRespuesta" prefHeight="100.0" prefWidth="400.0" wrapText="true" promptText="Tu respuesta aquí..." style="-fx-font-size: 14px;"/>
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </VBox.margin>
+      </VBox>
+
+      <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 0 30 30 30;">
+         <children>
+            <Button onAction="#accionGuardarSalir" text="💾 Guardar y Salir" style="-fx-background-color: #78909C; -fx-text-fill: white;">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+            
+            <Label maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+
+            <Button fx:id="btnAnterior" onAction="#accionAnterior" text="⬅ Anterior" style="-fx-background-color: #FF9800; -fx-text-fill: white;">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+            
+            <Button fx:id="btnSiguiente" onAction="#accionSiguiente" text="Siguiente ➡" style="-fx-background-color: #2196F3; -fx-text-fill: white;">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
+      
+   </children>
+</VBox>

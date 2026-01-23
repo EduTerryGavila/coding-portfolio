@@ -1,0 +1,213 @@
+[ "java.util.ArrayList", [ {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 1,
+  "nombre" : "Mates basicas",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 2,
+    "nombre" : "Profesor Mates",
+    "email" : "mates@gmail.com",
+    "password" : "mates",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 232,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaRellenarHueco",
+    "id" : null,
+    "enunciado" : "2 + 2 = _",
+    "curso" : null,
+    "respuestaCorrecta" : "4"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "2 * 3 = ",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "2", "3", "6" ] ],
+    "indiceCorrecta" : 2,
+    "textoRespuestaCorrecta" : "6"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "Cual es la raiz cuadrada de 25",
+    "curso" : null,
+    "respuestaCorrecta" : "5"
+  } ] ]
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 2,
+  "nombre" : "Mates avanzadas",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 2,
+    "nombre" : "Profesor Mates",
+    "email" : "mates@gmail.com",
+    "password" : "mates",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 232,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "Cual es una indeterminacion",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "0/0", "5*0", "1-1" ] ],
+    "indiceCorrecta" : 0,
+    "textoRespuestaCorrecta" : "0/0"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "Cual es la derivada de 2x^2",
+    "curso" : null,
+    "respuestaCorrecta" : "4x"
+  } ] ]
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 3,
+  "nombre" : "Fisica",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 3,
+    "nombre" : "Profe de fisica",
+    "email" : "fisica@gmail.com",
+    "password" : "fisica",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 268,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaRellenarHueco",
+    "id" : null,
+    "enunciado" : "F = m * _",
+    "curso" : null,
+    "respuestaCorrecta" : "a"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "Cual es la fuerza opuesta al peso en un objeto sobre el agua",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "Empuje", "Peso opuesto", "Normal" ] ],
+    "indiceCorrecta" : 0,
+    "textoRespuestaCorrecta" : "Empuje"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "Cual es la formula de la relatividad",
+    "curso" : null,
+    "respuestaCorrecta" : "E = m * c^2"
+  } ] ]
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 4,
+  "nombre" : "Tipos",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 4,
+    "nombre" : "Trainer",
+    "email" : "pokemon@gmail.com",
+    "password" : "poke",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 241,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "De que tipo es pikachu",
+    "curso" : null,
+    "respuestaCorrecta" : "Electrico"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaRellenarHueco",
+    "id" : null,
+    "enunciado" : "El tipo V_ no afecta al Acero",
+    "curso" : null,
+    "respuestaCorrecta" : "Veneno"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "Que tipo es muy eficaz contra el Volador",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "Lucha", "Hielo", "Normal" ] ],
+    "indiceCorrecta" : 1,
+    "textoRespuestaCorrecta" : "Hielo"
+  } ] ]
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 5,
+  "nombre" : "Numeros pokedex",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 4,
+    "nombre" : "Trainer",
+    "email" : "pokemon@gmail.com",
+    "password" : "poke",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 241,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "Cual es el primer pokemon de la pokedex",
+    "curso" : null,
+    "respuestaCorrecta" : "Bulbasaur"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaRellenarHueco",
+    "id" : null,
+    "enunciado" : "El numero 152 pertenece a J_",
+    "curso" : null,
+    "respuestaCorrecta" : "Johto"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "En la pokedex hay",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "1025 pokemon", "1204 pokemon", "757 pokemon" ] ],
+    "indiceCorrecta" : 0,
+    "textoRespuestaCorrecta" : "1025 pokemon"
+  } ] ]
+}, {
+  "@class" : "com.miapp.flashcards.modelo.Curso",
+  "id" : 6,
+  "nombre" : "General minecraft",
+  "creador" : {
+    "@class" : "com.miapp.flashcards.modelo.Creador",
+    "id" : 5,
+    "nombre" : "Steve",
+    "email" : "minecraft@gmail.com",
+    "password" : "mine",
+    "fechaRegistro" : "2026-01-12",
+    "tiempoUsoSegundos" : 0,
+    "cursosCreados" : 0
+  },
+  "preguntas" : [ "java.util.ArrayList", [ {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "Cuantos items son un stack de bloques",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "16", "32", "64" ] ],
+    "indiceCorrecta" : 2,
+    "textoRespuestaCorrecta" : "64"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaAbierta",
+    "id" : null,
+    "enunciado" : "Si picas una mena de diamante con un pico de oro lo dropea?",
+    "curso" : null,
+    "respuestaCorrecta" : "No"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaVerdaderoOFalso",
+    "id" : null,
+    "enunciado" : "Que encantamiento puede llevar un pico?",
+    "curso" : null,
+    "opciones" : [ "java.util.ArrayList", [ "Botin III", "Fortuna IV", "Eficiencia V" ] ],
+    "indiceCorrecta" : 2,
+    "textoRespuestaCorrecta" : "Eficiencia V"
+  }, {
+    "@class" : "com.miapp.flashcards.modelo.PreguntaRellenarHueco",
+    "id" : null,
+    "enunciado" : "Hacen falta _ ojos de ender para hacer un portal al end",
+    "curso" : null,
+    "respuestaCorrecta" : "12"
+  } ] ]
+} ] ]
