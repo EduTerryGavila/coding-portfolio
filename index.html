@@ -3,8 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Portfolio de Desarrollador</title>
+    <title>Portfolio de Eduardo Terry | Ingeniero en IA</title>
+    
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <meta property="og:title" content="Portfolio de Eduardo Terry">
+    <meta property="og:description" content="Ingeniero en IA y Programador. Mira mis proyectos en Java, C++ y Machine Learning con R.">
+    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"> <meta property="og:url" content="https://eduterrygavila.github.io/coding-portfolio/">
+    <meta property="og:type" content="website">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .tech-stack {
+            margin-bottom: 12px;
+        }
+        .tech-tag {
+            background-color: #e1e4e8;
+            color: #24292e;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 6px;
+            display: inline-block;
+            border: 1px solid #d1d5da;
+        }
+        .btn-secondary i, .social-links i {
+            margin-right: 8px;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,7 +51,7 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>Hola, soy Eduardo Terry</h1>
+            <h1>Eduardo Terry</h1>
             <p>Programador | Ingeniero en IA</p>
             <a href="#proyectos" class="btn-primary">Ver mis proyectos</a>
         </div>
@@ -32,33 +63,59 @@
             
             <article class="project-card">
                 <h3>App de Gestión de Gastos</h3>
-                <p>Aplicación para la gestión de gastos individuales o cuentas compartidas en Java.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">Maven</span>
+                    <span class="tech-tag">JavaFX</span>
+                </div>
+                <p>Aplicación para la gestión de gastos individuales o cuentas compartidas.</p>
                 <div class="links">
-                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/Java/GestionGastos" target="_blank" rel="noopener noreferrer" class="btn-secondary">Ver Código</a>
+                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/Java/GestionGastos" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        <i class="fab fa-github"></i> Ver Código
+                    </a>
                 </div>
             </article>
 
             <article class="project-card">
                 <h3>App de Cursos con FlashCards</h3>
-                <p>Aplicación de creación y realización de cursos en Java.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Java</span>
+                    <span class="tech-tag">Maven</span>
+                    <span class="tech-tag">JavaFX</span>
+                </div>
+                <p>Aplicación de creación y realización de cursos interactivos.</p>
                 <div class="links">
-                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/Java/FlashCardsApp" target="_blank" rel="noopener noreferrer" class="btn-secondary">Ver Código</a>
+                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/Java/FlashCardsApp" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        <i class="fab fa-github"></i> Ver Código
+                    </a>
                 </div>
             </article>
 
             <article class="project-card">
-                <h3>Sistema basado en Reglas con Factores de Certeza</h3>
-                <p>Motor de inferencia con reglas y factores de certeza en C++.</p>
+                <h3>Sistema Basado en Reglas</h3>
+                <div class="tech-stack">
+                    <span class="tech-tag">C++</span>
+                    <span class="tech-tag">IA</span>
+                </div>
+                <p>Motor de inferencia con reglas y factores de certeza (SBR-FC).</p>
                 <div class="links">
-                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/C++/SBR-FC-SSII" target="_blank" rel="noopener noreferrer" class="btn-secondary">Ver Código</a>
+                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/C++/SBR-FC-SSII" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        <i class="fab fa-github"></i> Ver Código
+                    </a>
                 </div>
             </article>
 
             <article class="project-card">
-                <h3>Prediccion con Machine Learning.</h3>
-                <p>Predicción de una base de datos junto con análisis en R usando la librería Caret.</p>
+                <h3>Predicción con Machine Learning</h3>
+                <div class="tech-stack">
+                    <span class="tech-tag">R</span>
+                    <span class="tech-tag">Caret</span>
+                </div>
+                <p>Predicción de base de datos y análisis estadístico avanzado.</p>
                 <div class="links">
-                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/R/MachineLearning" target="_blank" rel="noopener noreferrer" class="btn-secondary">Ver Código</a>
+                    <a href="https://github.com/EduTerryGavila/coding-portfolio/tree/main/Programas/R/MachineLearning" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                        <i class="fab fa-github"></i> Ver Código
+                    </a>
                 </div>
             </article>
 
@@ -68,8 +125,12 @@
     <footer id="contacto">
         <p>¿Te interesa mi código?</p>
         <div class="social-links">
-            <a href="https://github.com/EduTerryGavila/coding-portfolio" target="_blank" rel="noopener noreferrer">Mi Perfil de GitHub</a>
-            <a href="mailto:eduardo.terrygavila@gmail.com">Envíame un correo</a>
+            <a href="https://github.com/EduTerryGavila/coding-portfolio" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i> Mi Perfil de GitHub
+            </a>
+            <a href="mailto:eduardo.terrygavila@gmail.com">
+                <i class="fas fa-envelope"></i> Envíame un correo
+            </a>
         </div>
     </footer>
 
