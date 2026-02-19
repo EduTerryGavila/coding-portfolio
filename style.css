@@ -95,12 +95,13 @@ section {
 .btn-primary {
     display: inline-block;
     padding: 10px 20px;
-    background-color: transparent;
-    color: white;
+    background: transparent !important;
+    color: white !important;
     text-decoration: none;
     border-radius: 5px;
     font-weight: bold;
     margin-top: 1rem;
+    box-shadow: none !important;
 }
 
 .btn-secondary {
