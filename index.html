@@ -5,33 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio de Eduardo Terry | Ingeniero en IA</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <meta property="og:title" content="Portfolio de Eduardo Terry">
     <meta property="og:description" content="Ingeniero en IA y Programador. Mira mis proyectos en Java, C++ y Machine Learning con R.">
-    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"> <meta property="og:url" content="https://eduterrygavila.github.io/coding-portfolio/">
+    <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"> 
+    <meta property="og:url" content="https://eduterrygavila.github.io/coding-portfolio/">
     <meta property="og:type" content="website">
 
     <style>
         html {
             scroll-behavior: smooth;
         }
-        .tech-stack {
-            margin-bottom: 12px;
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(114, 9, 183, 0.8);
+            cursor: pointer;
         }
+
+        .tech-stack {
+            margin-bottom: 16px;
+        }
+        
         .tech-tag {
-            background-color: #e1e4e8;
-            color: #24292e;
-            padding: 4px 10px;
+            background-color: rgba(114, 9, 183, 0.15);
+            color: #e2d1f0;
+            padding: 4px 12px;
             border-radius: 15px;
             font-size: 0.75rem;
             font-weight: 700;
             margin-right: 6px;
+            margin-bottom: 6px;
             display: inline-block;
-            border: 1px solid #d1d5da;
+            border: 1px solid rgba(247, 37, 133, 0.4);
+            box-shadow: 0 0 8px rgba(247, 37, 133, 0.1);
+            transition: all 0.3s ease;
         }
+
+        .tech-tag:hover {
+            background-color: rgba(247, 37, 133, 0.2);
+            border-color: #f72585;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        
         .btn-secondary i, .social-links i {
             margin-right: 8px;
         }
@@ -52,13 +76,13 @@
     <section class="hero">
         <div class="hero-content">
             <h1>Eduardo Terry</h1>
-            <p>Programador | Ingeniero en IA</p>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem; color: #dcd6e7; font-weight: 600;">Programador | Ingeniero en IA</p>
             <a href="#proyectos" class="btn-primary">Ver mis proyectos</a>
         </div>
     </section>
 
     <section id="proyectos" class="projects-section">
-        <h2>Mis Proyectos en GitHub</h2>
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #ffffff; text-shadow: 0 0 15px rgba(114, 9, 183, 0.5);">Mis Proyectos en GitHub</h2>
         <div class="projects-grid">
             
             <article class="project-card">
@@ -123,7 +147,7 @@
     </section>
 
     <footer id="contacto">
-        <p>¿Te interesa mi código?</p>
+        <p style="font-size: 1.5rem; margin-bottom: 1rem; font-weight: 700;">¿Te interesa mi código?</p>
         <div class="social-links">
             <a href="https://github.com/EduTerryGavila/coding-portfolio" target="_blank" rel="noopener noreferrer">
                 <i class="fab fa-github"></i> Mi Perfil de GitHub
