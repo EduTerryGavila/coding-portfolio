@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Principal</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .oculto {
+      display: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "date-fns": "https://cdn.jsdelivr.net/npm/date-fns@3.3.1/+esm",
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
+    }
+  }
+</script>
+</head>
+<body>
+<div class="cabecera-menu-bienvenido">
+    <h1 id="saludo-usuario" class="bienvenido-alumno"></h1>
+  </div>
+  <div class="contenedor-menu">
+    <h2>Menú Principal</h2>
+    
+    <div id="seccion-anuncios" class="lista-elegante" style="border-color: #f59e0b; background-color: #fffbeb; margin-bottom: 25px;">
+      <h3 style="margin-top: 0; color: #d97706; display: flex; align-items: center; gap: 8px;">
+        📢 Tablón de Anuncios
+      </h3>
+      
+      <div id="admin-controls-anuncios" class="oculto" style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px dashed #fcd34d;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <input type="text" id="input-nuevo-anuncio" placeholder="Escribe un nuevo anuncio..." style="flex: 3; margin: 0; border-color: #fcd34d;">
+          <button id="btn-anadir-anuncio" style="flex: 1; background-color: #f59e0b !important; color: white !important; min-width: 100px;">Publicar</button>
+        </div>
+      </div>
+
+      <div id="lista-anuncios">
+      </div>
+    </div>
+
+    <div class="botones">
+      <button type="button" id="btn-tabla">Calendario</button>
+      <button type="button" id="btn-test">Tareas</button>
+      <button type="button" id="btn-abrir-chat" style="background-color: #8b5cf6 !important; color: white !important;">💬 Chat</button>
+    </div>
+
+    <div id="seccion-tabla" class="oculto">
+      <h3>Registro de Enlaces Privados</h3>
+      
+      <div id="admin-controls" class="oculto" style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+        <h4 style="margin-top: 0;">Asignar Enlace a Alumno</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+          <select id="select-usuario-enlace" style="flex: 1; min-width: 150px; margin: 0; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; font-family: 'Nunito', sans-serif; background-color: #f8fafc; color: #334155; font-weight: 700;"></select>
+          <input type="date" id="input-fecha" style="flex: 1; min-width: 150px; margin: 0;">
+          <input type="url" id="input-url" placeholder="URL del enlace" style="flex: 2; min-width: 200px; margin: 0;">
+          <button id="btn-anadir" style="flex: 1; background-color: #28a745; color: white; min-width: 100px;">Asignar</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th id="th-alumno-tabla" class="oculto">Alumno</th>
+            <th>Fecha</th>
+            <th>Enlace</th>
+            <th id="th-acciones-tabla" class="oculto">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="seccion-test" class="oculto">
+      <h3>Registro de Tests Privados</h3>
+      
+      <div id="admin-controls-test" class="oculto" style="margin-bottom: 15px; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 4px;">
+        <h4 style="margin-top: 0;">Asignar Test a Alumno</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+          <select id="select-usuario-test" style="flex: 1; min-width: 150px; margin: 0; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; font-family: 'Nunito', sans-serif; background-color: #f8fafc; color: #334155; font-weight: 700;"></select>
+          <input type="url" id="input-nombre-test" placeholder="URL del Google Form" style="flex: 2; min-width: 150px; margin: 0;">
+          <input type="text" id="input-nota-test" placeholder="Temas" style="flex: 1; min-width: 100px; margin: 0;">
+          <button id="btn-anadir-test" style="flex: 1; background-color: #28a745; color: white; min-width: 100px;">Asignar</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th id="th-alumno-test" class="oculto">Alumno</th>
+            <th>Test</th>
+            <th>Temas</th>
+            <th id="th-acciones-test" class="oculto">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="cuerpo-tabla-test">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="seccion-chat" class="oculto lista-elegante" style="border: 2px solid #8b5cf6; margin-top: 20px;">
+  <h3 style="color: #6d28d9; margin-top: 0;">Mensajes Privados</h3>
+  
+  <div id="admin-selector-chat" class="oculto" style="margin-bottom: 15px;">
+    <label style="font-weight: bold; font-size: 14px;">Hablar con el alumno:</label>
+    <select id="select-usuario-chat" style="width: 100%; margin-top: 5px;"></select>
+  </div>
+
+  <div id="caja-mensajes" style="height: 250px; overflow-y: auto; background: white; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+    </div>
+
+  <div style="display: flex; gap: 8px;">
+    <input type="text" id="input-texto-chat" placeholder="Escribe..." style="flex: 1; margin: 0;">
+    <button id="btn-enviar-chat" style="background-color: #8b5cf6 !important; color: white !important; width: auto; margin: 0; padding: 0 15px;">Enviar</button>
+  </div>
+</div>
+
+    <div id="seccion-dudas" class="oculto lista-elegante" style="margin-top: 25px; border-color: #bfdbfe; background-color: #eff6ff;">
+      <h3 style="margin-top: 0; color: #1d4ed8;">Buzón de Dudas</h3>
+      <p style="font-size: 14px; color: #475569; margin-bottom: 15px;">Escribe tu duda aquí y le llegará directamente al correo de la profesora.</p>
+      <textarea id="input-duda" rows="4" placeholder="Escribe tu mensaje..." style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 12px; font-family: 'Nunito', sans-serif; resize: vertical; margin-bottom: 10px; box-sizing: border-box;"></textarea>
+      <button id="btn-enviar-duda" style="background-color: #3b82f6 !important; color: white !important; width: 100%;">Enviar correo</button>
+      <p id="mensaje-duda-estado" class="oculto" style="margin-top: 15px; text-align: center; font-weight: 800; font-size: 15px;"></p>
+    </div>
+
+    <div class="botones">
+      <button id="btn-ver-matriculados" class="oculto btn-admin-estilizado">Ver matriculados</button>
+      <button id="btn-crear-cuenta-admin" class="oculto btn-admin-estilizado" style="background-color: #10b981 !important;">Crear cuenta</button>
+      <button id="btn-eliminar-cuenta" class="oculto btn-admin-estilizado" style="background-color: #f43f5e !important;">Eliminar cuenta</button>
+      <button id="btn-hacer-admin" class="oculto btn-admin-estilizado" style="background-color: #8b5cf6 !important;">Añadir admin</button>
+      <button id="btn-eliminar-propia-cuenta" class="oculto btn-admin-estilizado" style="background-color: #f59e0b !important;">Eliminar mi cuenta</button>
+    </div>
+
+    <div id="lista-matriculados" class="oculto lista-elegante"></div>
+    <div id="lista-eliminar-cuenta" class="oculto lista-elegante"></div>
+    <div id="lista-hacer-admin" class="oculto lista-elegante"></div>
+
+    <div id="panel-crear-cuenta" class="oculto lista-elegante">
+      <h4 style="margin-top:0; color:#10b981;">Crear Nueva Cuenta</h4>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">Introduce los datos del nuevo alumno.</p>
+      <input type="text" id="input-nuevo-nombre" placeholder="Nombre y apellidos completos">
+      <input type="text" id="input-nuevo-usuario" placeholder="Usuario">
+      <input type="password" id="input-nueva-password" placeholder="Contraseña">
+      <input type="password" id="input-nueva-password-confirm" placeholder="Repite la contraseña">
+      
+      <p id="error-crear-cuenta" class="oculto" style="color: #e11d48; background-color: #fff1f2; padding: 10px; border-radius: 8px; border: 1px solid #ffe4e6; font-size: 14px; font-weight: 800; margin-bottom: 15px;"></p>
+
+      <div class="botones">
+        <button id="btn-confirmar-crear" style="background-color: #10b981 !important; color: white !important;">Crear Alumno</button>
+        <button id="btn-cancelar-crear" style="background-color: #94a3b8 !important; color: white !important;">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="confirmacion-accion" class="oculto lista-elegante">
+      <h4 id="titulo-confirmacion" style="margin-top:0;">Confirmar acción</h4>
+      <p id="texto-confirmacion" style="font-size: 14px; color: #64748b; margin-bottom: 15px;"></p>
+      <div class="botones">
+        <button id="btn-confirmar-accion" style="color: white !important;">Confirmar</button>
+        <button id="btn-cancelar-accion" style="background-color: #94a3b8 !important; color: white !important;">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="confirmacion-eliminar-propia" class="oculto lista-elegante">
+      <h4 style="margin-top:0; color:#f59e0b;">Confirmar eliminación</h4>
+      <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">Introduce tus datos para borrar tu cuenta permanentemente.</p>
+      <input type="text" id="input-eliminar-usuario" placeholder="Tu usuario">
+      <input type="password" id="input-eliminar-password" placeholder="Tu contraseña">
+      
+      <p id="error-eliminar-propia" class="oculto" style="color: #e11d48; background-color: #fff1f2; padding: 10px; border-radius: 8px; border: 1px solid #ffe4e6; font-size: 14px; font-weight: 800; margin-bottom: 15px;"></p>
+
+      <div class="botones">
+        <button id="btn-confirmar-eliminar" style="background-color: #f43f5e !important; color: white !important;">Borrar mi cuenta</button>
+        <button id="btn-cancelar-eliminar" style="background-color: #94a3b8 !important; color: white !important;">Cancelar</button>
+      </div>
+    </div>     
+
+    <div class="contenedor-boton-abajo">
+      <button type="button" id="btn-cerrarSesion" style="background-color: #dc3545; color: white;">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <script type="module" src="menu.js"></script>
+</body>
+</html>
