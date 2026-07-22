@@ -20,7 +20,7 @@ A continuación se detallan las distintas pantallas de la aplicación, estructur
 
 ## Vistas del Administrador
 
-- [Menú Administrador](imagenes/MenuAdmin.png): Panel principal del administrador desde donde se gestiona y coordina toda la plataforma de video clases.
+- ![Menú Administrador](imagenes/MenuAdmin.png): Panel principal del administrador desde donde se gestiona y coordina toda la plataforma de video clases.
 - [Enlaces a Clases](imagenes/EnlacesClases.png): Sección para organizar, publicar y modificar los enlaces de las sesiones de video en directo.
 - [Enlaces a Tests](imagenes/EnlacesTests.png): Apartado para la administración y distribución de cuestionarios y pruebas de evaluación.
 - [Chat de Plataforma](imagenes/Chat.png): Interfaz de mensajería centralizada para la comunicación directa y resolución de dudas en la academia.
